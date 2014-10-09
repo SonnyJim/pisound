@@ -3,12 +3,14 @@ INCLUDE	= -I/usr/include
 CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe -std=gnu99 -O3
 LDFLAGS	= -L/usr/lib 
 LDLIBS	= -lSDL -lSDL_mixer -lpthread
+OBJS = pisound.o queue.o cfg.o
 
 all: pisound
 
-pisound: pisound.o queue.o
+pisound: $(OBJS)
 	@echo [link]
-	@$(CC) -o $@ pisound.o queue.o $(LDFLAGS) $(LDLIBS)
+	@$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 clean:
 	rm *.o
+	rm pisound
