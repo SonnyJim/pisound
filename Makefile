@@ -12,5 +12,5 @@ pisound: $(OBJS)
 	@$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 clean:
-	rm *.o
-	rm pisound
+	rm -rf *.o
+	rm -rf pisound

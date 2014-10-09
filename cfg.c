@@ -14,7 +14,8 @@ int cfg_load (void)
     init_sounds ();
 
     //Load the sound FX
-    fprintf (stdout, "Attempting to load sound list %s\n", DEFAULT_SOUND_FILE);
+    if (verbose)
+        fprintf (stdout, "Attempting to load sound list %s\n", DEFAULT_SOUND_FILE);
     sound_list = fopen (DEFAULT_SOUND_FILE, "r");
     
     if (sound_list == NULL)
@@ -33,10 +34,13 @@ int cfg_load (void)
             len = strlen (sound_file);
             if (sound_file[len - 1] == '\n')
                 sound_file[len - 1] = '\0';
-           
-            fprintf (stdout, "Loading %s @ position %i\n", sound_file, sound_num);
+          
+            if (verbose)
+                fprintf (stdout, "Loading %s @ position %i\n", sound_file, sound_num);
+            
             sounds[sound_num] = Mix_LoadWAV (sound_file);
-	        if(sounds[sound_num] == NULL) 
+	       
+            if(sounds[sound_num] == NULL) 
             {
 		        printf("\nUnable to load file %s: %s\n", sound_file, Mix_GetError());
                 return 1;
@@ -47,7 +51,8 @@ int cfg_load (void)
 
 
     //Load the music WAVs
-    fprintf (stdout, "Attempting to load music list %s\n", DEFAULT_MUSIC_FILE);
+    if (verbose)
+        fprintf (stdout, "Attempting to load music list %s\n", DEFAULT_MUSIC_FILE);
     sound_list = fopen (DEFAULT_MUSIC_FILE, "r");
     
     if (sound_list == NULL)
@@ -66,8 +71,9 @@ int cfg_load (void)
             len = strlen (sound_file);
             if (sound_file[len - 1] == '\n')
                 sound_file[len - 1] = '\0';
-           
-            fprintf (stdout, "Loading %s @ position %i\n", sound_file, sound_num);
+          
+            if (verbose)
+                fprintf (stdout, "Loading %s @ position %i\n", sound_file, sound_num);
             music[sound_num] = Mix_LoadMUS (sound_file);
 	        if(music[sound_num] == NULL) 
             {

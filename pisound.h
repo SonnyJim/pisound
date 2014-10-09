@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <signal.h>
+#include <getopt.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
@@ -35,6 +36,7 @@ int music_current;
 int music_requested;
 
 int running;
+int verbose;
 
 //sound queue
 struct sound_queue_t {

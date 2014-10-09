@@ -97,12 +97,25 @@ int main(int argc, char *argv[])
 	Uint16 audio_format = AUDIO_S16SYS;
 	int audio_channels = 1;
 	int audio_buffers = 4096;
-    int ret;
+    int ret, c;
 
     fprintf (stdout, "=========\n");
-    fprintf (stdout, " PiSound\n");
+    fprintf (stdout, "|PiSound|\n");
     fprintf (stdout, "=========\n\n");
-    
+  
+    verbose = 0;
+    running = 0;
+   
+    //read command line arguments
+    while ((c = getopt (argc, argv, "v")) != -1)
+    {
+        switch (c)
+        {
+        case 'v':
+            verbose = 1;
+        }
+    }
+
     //Initialize SDL audio
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
 		printf("Unable to initialize SDL: %s\n", SDL_GetError());
@@ -135,7 +148,7 @@ int main(int argc, char *argv[])
 
     //setup signal handler
     if (signal(SIGINT, sig_handler) == SIG_ERR)
-        printf("\ncan't catch SIGINT\n");
+        fprintf(stderr, "\ncan't catch SIGINT\n");
    
     running = 1;
     //Start the GPIO thread
