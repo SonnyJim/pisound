@@ -1,4 +1,18 @@
 #include "pisound.h"
+
+void sig_handler (int signo)
+{
+    if (signo == SIGINT)
+    { 
+        fprintf (stdout, "SIGINT detected, shutting down\n");
+        pthread_cancel (thread1);
+        free_sounds ();
+	    Mix_CloseAudio();
+	    SDL_Quit();	
+        running = 0;
+    }
+}
+
 //Initialise the sound array with NULL pointers
 void init_sounds (void)
 {
@@ -44,7 +58,7 @@ void music_check (void)
 void play_sounds (void)
 {
     fprintf (stdout, "Audio thread started\n");
-    while (1)
+    while (running)
     {
         music_check ();
         if (sound_queue.count > 0)
@@ -84,7 +98,6 @@ int main(int argc, char *argv[])
 	int audio_channels = 1;
 	int audio_buffers = 4096;
     int ret;
-    pthread_t thread1;
 
     fprintf (stdout, "=========\n");
     fprintf (stdout, " PiSound\n");
@@ -120,7 +133,11 @@ int main(int argc, char *argv[])
 
     music_requested = 1;
 
-
+    //setup signal handler
+    if (signal(SIGINT, sig_handler) == SIG_ERR)
+        printf("\ncan't catch SIGINT\n");
+   
+    running = 1;
     //Start the GPIO thread
     ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
     if (ret)
@@ -133,13 +150,6 @@ int main(int argc, char *argv[])
     //Start audio thread
     play_sounds ();
     
-    //Stop
-    pthread_cancel (thread1);
-    free_sounds ();
-	//Need to make sure that SDL_mixer and SDL have a chance to clean up
-	Mix_CloseAudio();
-	SDL_Quit();	
-	
 	//Return success!
 	return 0;
 }

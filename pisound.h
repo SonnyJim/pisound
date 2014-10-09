@@ -4,6 +4,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
@@ -33,6 +34,8 @@ int music_current;
 //Music requested
 int music_requested;
 
+int running;
+
 //sound queue
 struct sound_queue_t {
     int data[SOUND_QUEUE_SIZE + 1];
@@ -40,6 +43,9 @@ struct sound_queue_t {
     int last;
     int count;
 } sound_queue;
+    
+//GPIO thread
+pthread_t thread1;
 
 struct sound_queue_t sound_queue;
 
@@ -50,3 +56,4 @@ void sound_queue_add (int sound_code);
 int cfg_load (void);
 
 void init_sounds (void);
+void free_sounds (void);
