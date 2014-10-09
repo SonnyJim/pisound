@@ -42,3 +42,8 @@ struct sound_queue_t {
 } sound_queue;
 
 struct sound_queue_t sound_queue;
+
+void sound_queue_init (void);
+int sound_queue_read (void);
+void sound_queue_add (int sound_code);
+
