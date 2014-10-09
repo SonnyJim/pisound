@@ -1,60 +1,4 @@
 #include "pisound.h"
-
-//Initialise the sound_queue
-void sound_queue_init (void)
-{
-    int i;
-    sound_queue.first = 0;
-    sound_queue.last = SOUND_QUEUE_SIZE - 1;
-    sound_queue.count = 0;
-
-    for (i = 0; i < SOUND_QUEUE_SIZE; i++)
-    {
-        sound_queue.data[i] = QUEUE_POS_EMPTY;
-    }
-}
-
-//Read the next item from the sound_queue
-int sound_queue_read (void)
-{
-    int i;
-    if (sound_queue.count <= 0) 
-    {
-        fprintf(stderr, "Warning: attempting to read from an empty queue.\n");
-        return (QUEUE_POS_EMPTY);
-    }
-    else 
-    {
-        i = sound_queue.data[sound_queue.first];
-        sound_queue.data[sound_queue.first] = QUEUE_POS_EMPTY;
-        sound_queue.first = (sound_queue.first+1) % SOUND_QUEUE_SIZE;
-        sound_queue.count = sound_queue.count - 1;
-    }
-    return (i);
-}
-
-//Add an item to the sound_queue
-void sound_queue_add (int sound_code)
-{
-    if (sound_queue.count >= SOUND_QUEUE_SIZE)
-        fprintf (stderr, "Error: sound_queue overflow\n");
-    else
-    {
-        sound_queue.last = (sound_queue.last + 1) % SOUND_QUEUE_SIZE;
-        sound_queue.data[sound_queue.last] = sound_code;
-        sound_queue.count = sound_queue.count + 1;
-    }
-}
-
-void sound_queue_display (void)
-{
-    int i;
-
-    for (i = 0; i < SOUND_QUEUE_SIZE; i++)
-        fprintf (stdout, "%i=%i ", i, sound_queue.data[i]);
-    fprintf (stdout, "front=%i rear=%i count=%i\n", sound_queue.first, sound_queue.last, sound_queue.count);
-}
-
 //Initialise the sound array with NULL pointers
 void init_sounds (void)
 {
@@ -168,16 +112,18 @@ void music_check (void)
     if (music_current != music_requested)
     {
         music_current = music_requested;
-        if (Mix_PlayMusic (music[music_current], -1) == -1)
-        {
+        
+        if (music_current == MUSIC_OFF)
+            Mix_HaltMusic ();
+        else if (Mix_PlayMusic (music[music_current], -1) == -1)
             fprintf (stderr, "Unable to play Music file: %s\n", Mix_GetError());
-        }
     }
 }
 
 //Play some sounds
 void play_sounds (void)
 {
+    fprintf (stdout, "Audio thread started\n");
     while (1)
     {
         music_check ();
@@ -189,8 +135,6 @@ void play_sounds (void)
             {
 	        	fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
 	        }
-	    //Wait until the sound has stopped playing
-	    //while(Mix_Playing(channel) != 0);
         }
     }
 }
@@ -206,6 +150,9 @@ void *gpio_thread(void *ptr)
             sleep (2);
             sound_queue_add (i);
             sleep (2);
+            sound_queue_add (i);
+            music_requested = MUSIC_OFF;
+            sleep (2);
         }
     }
 }
@@ -219,9 +166,9 @@ int main(int argc, char *argv[])
     int ret;
     pthread_t thread1;
 
-    fprintf (stdout, "=======\n");
-    fprintf (stdout, "PiSound\n");
-    fprintf (stdout, "=======\n\n");
+    fprintf (stdout, "=========\n");
+    fprintf (stdout, " PiSound\n");
+    fprintf (stdout, "=========\n\n");
     
     //Initialize SDL audio
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
@@ -253,12 +200,21 @@ int main(int argc, char *argv[])
 
     music_requested = 1;
 
+
+    //Start the GPIO thread
     ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
     if (ret)
     {
         fprintf(stderr,"Error creating gpio_thread: %i\n",ret);
     }
+    else
+        fprintf (stdout, "GPIO thread started\n");
+
+    //Start audio thread
     play_sounds ();
+    
+    //Stop
+    pthread_cancel (thread1);
     free_sounds ();
 	//Need to make sure that SDL_mixer and SDL have a chance to clean up
 	Mix_CloseAudio();

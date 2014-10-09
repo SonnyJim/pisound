@@ -6,9 +6,9 @@ LDLIBS	= -lSDL -lSDL_mixer -lpthread
 
 all: pisound
 
-tidbot: pisound.o
+pisound: pisound.o queue.o
 	@echo [link]
-	@$(CC) -o $@ pisound $(LDFLAGS) $(LDLIBS)
+	@$(CC) -o $@ pisound.o queue.o $(LDFLAGS) $(LDLIBS)
 
 clean:
 	rm *.o
