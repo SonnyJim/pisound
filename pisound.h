@@ -47,3 +47,6 @@ void sound_queue_init (void);
 int sound_queue_read (void);
 void sound_queue_add (int sound_code);
 
+int cfg_load (void);
+
+void init_sounds (void);
