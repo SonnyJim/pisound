@@ -4,7 +4,7 @@ void sig_handler (int signo)
 {
     if (signo == SIGINT)
     { 
-        fprintf (stdout, "SIGINT detected, shutting down\n");
+        fprintf (stdout, "\nSIGINT detected, shutting down\n");
         pthread_cancel (thread1);
         free_sounds ();
 	    Mix_CloseAudio();
@@ -54,6 +54,26 @@ void music_check (void)
     }
 }
 
+//Scale the volume range between SDL/WPC
+//0 - 128 vs 0 - 32
+void volume_up (void)
+{
+    if (volume < MAX_VOLUME)
+    {
+        volume++;
+        Mix_Volume (-1, volume * 8);    
+    }
+}
+
+void volume_down (void)
+{
+    if (volume > 0)
+    {
+        volume--;
+        Mix_Volume (-1, volume * 8);  
+    }
+}
+
 //Play some sounds
 void play_sounds (void)
 {
@@ -73,6 +93,7 @@ void play_sounds (void)
     }
 }
 
+//Read the GPIO
 void *gpio_thread(void *ptr)
 {
     int i;
@@ -88,6 +109,22 @@ void *gpio_thread(void *ptr)
             music_requested = MUSIC_OFF;
             sleep (2);
         }
+        /*
+
+        //Decode sound_code from GPIO
+        switch (sound_code)
+        {
+            case SND_VOL_UP:
+                volume_up ();
+                break;
+            case SND_VOL_DOWN:
+                volume_down ();
+                break;
+            case SND_STOP_MUSIC:
+                music_requested = MUSIC_OFF;
+                break;
+        }
+        */
     }
 }
 
@@ -113,6 +150,7 @@ int main(int argc, char *argv[])
         {
         case 'v':
             verbose = 1;
+            break;
         }
     }
 
@@ -151,6 +189,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "\ncan't catch SIGINT\n");
    
     running = 1;
+    
     //Start the GPIO thread
     ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
     if (ret)
@@ -162,7 +201,7 @@ int main(int argc, char *argv[])
 
     //Start audio thread
     play_sounds ();
-    
-	//Return success!
+   
+    fprintf (stdout, "\nExiting\n");
 	return 0;
 }

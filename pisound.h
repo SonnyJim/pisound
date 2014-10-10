@@ -18,6 +18,7 @@
 #define MUSIC_QUEUE_SIZE 16
 #define QUEUE_POS_EMPTY 256
 #define MUSIC_OFF 256
+#define MAX_VOLUME 128
 
 #define DEFAULT_SOUND_FILE "sounds.cfg"
 #define DEFAULT_MUSIC_FILE "music.cfg"
@@ -37,6 +38,7 @@ int music_requested;
 
 int running;
 int verbose;
+int volume;
 
 //sound queue
 struct sound_queue_t {
