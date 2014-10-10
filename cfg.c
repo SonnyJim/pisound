@@ -27,6 +27,12 @@ int cfg_load (void)
         if (cfg_line[0] != '#')
         {
             sound_num = atoi (strtok (cfg_line, delim));
+            if (sound_num > MAX_SOUNDS)
+            {
+                fprintf (stderr, "Error: sound_num larger than maximum allowed: %i max=%i\n", sound_num, MAX_SOUNDS);
+                return 1;
+            }
+
             sound_file = strtok (NULL, delim);
    
             //TODO This will probably break if pisound.cfg has Windows line endings
@@ -42,13 +48,12 @@ int cfg_load (void)
 	       
             if(sounds[sound_num] == NULL) 
             {
-		        printf("\nUnable to load file %s: %s\n", sound_file, Mix_GetError());
+		        fprintf(stderr, "\nUnable to load file %s: %s\n", sound_file, Mix_GetError());
                 return 1;
             }
         }
     }
     fclose (sound_list);
-
 
     //Load the music WAVs
     if (verbose)
@@ -64,6 +69,12 @@ int cfg_load (void)
         if (cfg_line[0] != '#')
         {
             sound_num = atoi (strtok (cfg_line, delim));
+            if (sound_num > MAX_MUSIC)
+            {
+                fprintf (stderr, "Error: music_num larger than maximum allowed: %i max=%i\n", sound_num, MAX_MUSIC);
+                return 1;
+            }
+
             sound_file = strtok (NULL, delim);
    
             //TODO This will probably break if pisound.cfg has Windows line endings

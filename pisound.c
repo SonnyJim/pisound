@@ -100,6 +100,7 @@ void *gpio_thread(void *ptr)
     int i;
     while (1)
     {
+        /*
         for (i = 0; i < 5; i++)
         {
             music_requested = i;
@@ -110,6 +111,7 @@ void *gpio_thread(void *ptr)
             music_requested = MUSIC_OFF;
             sleep (2);
         }
+        */
         /*
 
         //Decode sound_code from GPIO
@@ -179,12 +181,6 @@ int main(int argc, char *argv[])
     //Initialise the sound_queue
     sound_queue_init ();
 
-    int j;
-    for (j = 0; j < 4;j++)
-        sound_queue_add (j);
-
-    music_requested = 1;
-
     //setup signal handler
     if (signal(SIGINT, sig_handler) == SIG_ERR)
         fprintf(stderr, "\ncan't catch SIGINT\n");
@@ -200,8 +196,8 @@ int main(int argc, char *argv[])
     else
         fprintf (stdout, "GPIO thread started\n");
 
-    //Start the udp socket
-    ret = pthread_create (&thread2, NULL, udp_thread, &udp_msg);
+    //Start the udp server
+    ret = pthread_create (&thread2, NULL, udp_thread, NULL);
     if (ret)
     {
         fprintf(stderr,"Error creating udp_thread: %i\n",ret);
@@ -209,7 +205,7 @@ int main(int argc, char *argv[])
     else
         fprintf (stdout, "UDP thread started\n");
 
-    //Start audio thread
+    //Start main audio thread
     play_sounds ();
    
     fprintf (stdout, "\nExiting\n");

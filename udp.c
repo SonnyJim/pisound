@@ -2,13 +2,46 @@
 #include <netinet/in.h>
 
 #include "pisound.h"
+#include "udp.h"
+static void decode_udp_msg (char *msg)
+{
+    int byte1, byte2;
+    char cmd[3], code[3];
+    printf ("decode: %s\n", msg);
+   
+    strncpy (cmd, msg, 2);
+    strncpy (code, msg + 2, 2);
+    printf ("cmd=%s code=%s\n", cmd, code);
+
+    byte1 = strtol (cmd, NULL, 16);
+    byte2 = strtol (code, NULL, 16);
+
+    if (byte1 > 255 || byte2 > 255)
+        fprintf (stderr, "Error in udp_msg decode: %i %i %s\n", byte1, byte2, msg);
+
+    switch (byte1)
+    {
+        case UDP_SOUND_PLAY:
+            sound_queue_add (byte2);
+            break;
+        case UDP_MUSIC_PLAY:
+            music_request (byte2);
+            break;
+        case UDP_MUSIC_STOP:
+            music_request (MUSIC_OFF);
+            break;
+        default:
+            fprintf (stderr, "Unrecognised udp_msg decode: %i %i %s\n", byte1, byte2, msg);
+            break;
+    }
+}
 
 void* udp_thread (void *ptr)
 {
    int sockfd,n;
    struct sockaddr_in servaddr,cliaddr;
    socklen_t len;
-   char mesg[1000];
+   char mesg[1024];
 
 
    if (verbose)
@@ -34,14 +67,12 @@ void* udp_thread (void *ptr)
        while (running)
        {
            len = sizeof(cliaddr);
-           n = recvfrom(sockfd,mesg,1000,0,(struct sockaddr *)&cliaddr,&len);
+           n = recvfrom(sockfd,mesg,1024,0,(struct sockaddr *)&cliaddr,&len);
            sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
-           printf("-------------------------------------------------------\n");
            mesg[n] = 0;
-           printf("Received the following:\n");
-           printf("%s",mesg);
-           strcpy (udp_msg, mesg);
-           printf("-------------------------------------------------------\n");
+           if (verbose)
+               fprintf (stdout, "UDP received: %s\n", mesg);
+           decode_udp_msg (mesg);
        }
    }
    if (verbose)
