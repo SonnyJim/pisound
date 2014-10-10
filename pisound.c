@@ -6,6 +6,7 @@ void sig_handler (int signo)
     { 
         fprintf (stdout, "\nSIGINT detected, shutting down\n");
         pthread_cancel (thread1);
+        pthread_cancel (thread2);
         free_sounds ();
 	    Mix_CloseAudio();
 	    SDL_Quit();	
@@ -198,6 +199,15 @@ int main(int argc, char *argv[])
     }
     else
         fprintf (stdout, "GPIO thread started\n");
+
+    //Start the udp socket
+    ret = pthread_create (&thread2, NULL, udp_thread, &udp_msg);
+    if (ret)
+    {
+        fprintf(stderr,"Error creating udp_thread: %i\n",ret);
+    }
+    else
+        fprintf (stdout, "UDP thread started\n");
 
     //Start audio thread
     play_sounds ();

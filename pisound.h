@@ -23,6 +23,7 @@
 #define DEFAULT_SOUND_FILE "sounds.cfg"
 #define DEFAULT_MUSIC_FILE "music.cfg"
 
+#define UDP_PORT 8008
 //List of all the pointers to the sounds that can be called
 Mix_Chunk *sounds[MAX_SOUNDS];
 Mix_Music *music[MAX_MUSIC];
@@ -49,7 +50,7 @@ struct sound_queue_t {
 } sound_queue;
     
 //GPIO thread
-pthread_t thread1;
+pthread_t thread1, thread2;
 
 struct sound_queue_t sound_queue;
 
@@ -61,3 +62,6 @@ int cfg_load (void);
 
 void init_sounds (void);
 void free_sounds (void);
+
+void* udp_thread (void *ptr);
+char udp_msg[1024];
