@@ -3,21 +3,28 @@
 
 #include "pisound.h"
 #include "udp.h"
-static void decode_udp_msg (char *msg)
+
+static void udp_send_version (struct sockaddr_in cliaddr)
+{
+    sendto(sockfd, UDP_VERSION_STRING, strlen (UDP_VERSION_STRING),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+}
+
+static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
 {
     int byte1, byte2;
     char cmd[3], code[3];
-    printf ("decode: %s\n", msg);
-   
+
+    //Grab the frst 2 bytes and convert to int
     strncpy (cmd, msg, 2);
     strncpy (code, msg + 2, 2);
-    printf ("cmd=%s code=%s\n", cmd, code);
-
     byte1 = strtol (cmd, NULL, 16);
     byte2 = strtol (code, NULL, 16);
 
     if (byte1 > 255 || byte2 > 255)
-        fprintf (stderr, "Error in udp_msg decode: %i %i %s\n", byte1, byte2, msg);
+        fprintf (stderr, "Error in udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
+
+    if (verbose)
+        fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
 
     switch (byte1)
     {
@@ -30,20 +37,23 @@ static void decode_udp_msg (char *msg)
         case UDP_MUSIC_STOP:
             music_request (MUSIC_OFF);
             break;
+        case UDP_VOLUME_UP:
+            volume_up ();
+            break;
+        case UDP_VOLUME_DOWN:
+            volume_down ();
+            break;
+        case UDP_VERSION:
+            udp_send_version (cliaddr);
+            break;
         default:
-            fprintf (stderr, "Unrecognised udp_msg decode: %i %i %s\n", byte1, byte2, msg);
+            fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
             break;
     }
 }
 
 void* udp_thread (void *ptr)
 {
-   int sockfd,n;
-   struct sockaddr_in servaddr,cliaddr;
-   socklen_t len;
-   char mesg[1024];
-
-
    if (verbose)
        fprintf (stdout, "Starting udp server\n");
    
@@ -52,11 +62,12 @@ void* udp_thread (void *ptr)
         fprintf (stderr, "Can't create socket: %s\n", strerror(errno));
    }
 
-   bzero(&servaddr,sizeof(servaddr));
+   memset (&servaddr, 0, sizeof(servaddr));
    servaddr.sin_family = AF_INET;
-   servaddr.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
-   servaddr.sin_port=htons(UDP_PORT);
-   if (bind(sockfd,(struct sockaddr *)&servaddr,sizeof(servaddr)) == -1)
+   servaddr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+   servaddr.sin_port = htons (UDP_PORT);
+
+   if (bind (sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
    {
        fprintf (stderr, "Error starting udp server: %s\n", strerror(errno));
    }
@@ -67,12 +78,11 @@ void* udp_thread (void *ptr)
        while (running)
        {
            len = sizeof(cliaddr);
-           n = recvfrom(sockfd,mesg,1024,0,(struct sockaddr *)&cliaddr,&len);
+           n = recvfrom (sockfd, mesg, UDP_BUFFLEN, 0, (struct sockaddr *) &cliaddr,&len);
+           //Echo request
            sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
            mesg[n] = 0;
-           if (verbose)
-               fprintf (stdout, "UDP received: %s\n", mesg);
-           decode_udp_msg (mesg);
+           udp_decode_msg (mesg, cliaddr);
        }
    }
    if (verbose)

@@ -22,7 +22,6 @@
 #define DEFAULT_SOUND_FILE "sounds.cfg"
 #define DEFAULT_MUSIC_FILE "music.cfg"
 
-#define UDP_PORT 8008
 
 //List of all the pointers to the sounds that can be called
 Mix_Chunk *sounds[MAX_SOUNDS];
@@ -60,6 +59,9 @@ int sound_queue_read (void);
 void sound_queue_init (void);
 void sound_queue_add (int sound_code);
 void music_request (int music_code);
+
+void volume_up (void);
+void volume_down (void);
 
 int cfg_load (void);
 
