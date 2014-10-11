@@ -14,11 +14,26 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
     int byte1, byte2;
     char cmd[3], code[3];
 
+    
     //Grab the frst 2 bytes and convert to int
     strncpy (cmd, msg, 2);
     strncpy (code, msg + 2, 2);
     byte1 = strtol (cmd, NULL, 16);
     byte2 = strtol (code, NULL, 16);
+
+    //Error checking
+    if (strlen (msg) < 2)
+    {
+        fprintf (stderr, "Error in udp_decode_msg: empty message");
+        return;
+    }
+    else if (strlen (msg) < 4 
+            && (byte1 == UDP_SOUND_PLAY || byte1 == UDP_MUSIC_PLAY))
+    {
+        fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
+        fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
+        return;
+    }
 
     if (byte1 > 255 || byte2 > 255)
         fprintf (stderr, "Error in udp_decode_msg: %i %i %s\n", byte1, byte2, msg);

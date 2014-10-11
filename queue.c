@@ -1,5 +1,13 @@
 #include "pisound.h"
 
+void music_request (int music_code)
+{
+    if (music_code < MAX_MUSIC || music_code == MUSIC_OFF)
+        music_requested = music_code;
+    else
+        fprintf (stderr, "Error: music_request out of range %i\n", music_code);
+}
+
 //Initialise the sound_queue
 void sound_queue_init (void)
 {
