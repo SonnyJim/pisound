@@ -24,8 +24,8 @@
 
 
 //List of all the pointers to the sounds that can be called
-Mix_Chunk *sounds[MAX_SOUNDS];
-Mix_Music *music[MAX_MUSIC];
+Mix_Chunk *sounds[MAX_SOUNDS + 1];
+Mix_Music *music[MAX_MUSIC + 1];
 
 //How many channels we use, currently mono
 int channel;
@@ -62,6 +62,7 @@ void music_request (int music_code);
 
 void volume_up (void);
 void volume_down (void);
+void volume_set (int volume);
 
 int cfg_load (void);
 

@@ -57,8 +57,16 @@ void music_check (void)
 
 //Scale the volume range between SDL/WPC
 //0 - 128 vs 0 - 32
+void volume_set (int volume)
+{
+    if (verbose)
+        fprintf (stdout, "Setting volume %i\n", volume);
+}
+
 void volume_up (void)
 {
+    if (verbose)
+        fprintf (stdout, "Volume up\n");
     if (volume < MAX_VOLUME)
     {
         volume++;
@@ -68,10 +76,22 @@ void volume_up (void)
 
 void volume_down (void)
 {
+    if (verbose)
+        fprintf (stdout, "Volume down\n");
     if (volume > 0)
     {
         volume--;
         Mix_Volume (-1, volume * 8);  
+    }
+}
+
+void sound_check (void)
+{
+    if (sound_queue.count > 0)
+    {
+        channel = Mix_PlayChannel(-1, sounds[sound_queue_read ()], 0);
+        if(channel == -1)
+	        fprintf(stderr, "Warning: Unable to play WAV file: %s\n", Mix_GetError());
     }
 }
 
@@ -82,15 +102,7 @@ void play_sounds (void)
     while (running)
     {
         music_check ();
-        if (sound_queue.count > 0)
-        {
-            channel = Mix_PlayChannel(-1, sounds[sound_queue_read ()], 0);
-
-            if(channel == -1) 
-            {
-	        	fprintf(stderr, "Unable to play WAV file: %s\n", Mix_GetError());
-	        }
-        }
+        sound_check ();
     }
 }
 

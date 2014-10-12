@@ -26,6 +26,7 @@ void sound_queue_init (void)
 int sound_queue_read (void)
 {
     int i;
+
     if (sound_queue.count <= 0) 
     {
         fprintf(stderr, "Warning: attempting to read from an empty queue.\n");
@@ -35,15 +36,30 @@ int sound_queue_read (void)
     {
         i = sound_queue.data[sound_queue.first];
         sound_queue.data[sound_queue.first] = QUEUE_POS_EMPTY;
-        sound_queue.first = (sound_queue.first+1) % SOUND_QUEUE_SIZE;
+        sound_queue.first = (sound_queue.first + 1) % SOUND_QUEUE_SIZE;
         sound_queue.count = sound_queue.count - 1;
     }
-    return (i);
+    if (i > MAX_SOUNDS || i > MAX_MUSIC)
+    {
+        fprintf (stderr, "Error:  sound_queue_read tried to return %i, which is bigger than MAX_SOUNDS/MAX_MUSIC\n", i);
+        exit (1);
+    }
+    else
+        return (i);
 }
 
 //Add an item to the sound_queue
 void sound_queue_add (int sound_code)
 {
+    if (verbose)
+        fprintf (stdout, "sound_queue_add %i\n", sound_code);
+
+    if (sound_code > MAX_SOUNDS || sound_code > MAX_MUSIC)
+    {
+        fprintf (stderr, "Error:  sound_queue_add tried to add %i, which is bigger than MAX_SOUNDS/MAX_MUSIC\n", sound_code);
+        return;
+    }
+
     if (sound_queue.count >= SOUND_QUEUE_SIZE)
         fprintf (stderr, "Error: sound_queue overflow\n");
     else
