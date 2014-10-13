@@ -4,6 +4,11 @@
 #include "pisound.h"
 #include "udp.h"
 
+static void udp_send_pong (struct sockaddr_in cliaddr)
+{
+    sendto(sockfd, UDP_PONG, strlen (UDP_PONG),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+}
+
 static void udp_send_version (struct sockaddr_in cliaddr)
 {
     sendto(sockfd, UDP_VERSION_STRING, strlen (UDP_VERSION_STRING),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
@@ -70,6 +75,9 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
             break;
         case UDP_VOLUME_SET:
             volume_set (byte2);
+            break;
+        case UDP_PING:
+            udp_send_pong (cliaddr);
             break;
         case UDP_VERSION:
             udp_send_version (cliaddr);

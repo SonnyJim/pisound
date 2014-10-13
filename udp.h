@@ -11,11 +11,13 @@
 #define UDP_VOLUME_DOWN 0x04
 #define UDP_VOLUME_SET  0x05
 
-#define UDP_VERSION 0xff
+#define UDP_PING        0xfe
+#define UDP_PONG        "PONG"
+#define UDP_VERSION     0xff
+#define UDP_VERSION_STRING "Pisound V0.1"
 
 #define UDP_PORT 8008
 #define UDP_BUFFLEN 16
-#define UDP_VERSION_STRING "Pisound V0.1"
 
 //Sent to client when an error occurs
 #define UDP_CMD_ERROR "ERROR"
