@@ -11,17 +11,13 @@
 #include <SDL/SDL_mixer.h>
 
 #define SOUND_QUEUE_SIZE 16
-#define MUSIC_QUEUE_SIZE 16
 #define QUEUE_POS_EMPTY 256
 
-#define MUSIC_OFF 256
-#define MAX_VOLUME 128
 #define MAX_SOUNDS 255
 #define MAX_MUSIC 255
 
-#define DEFAULT_SOUND_FILE "sounds.cfg"
-#define DEFAULT_MUSIC_FILE "music.cfg"
-
+//Command to stop music
+#define MUSIC_OFF 256
 
 //List of all the pointers to the sounds that can be called
 Mix_Chunk *sounds[MAX_SOUNDS + 1];
@@ -69,3 +65,7 @@ int cfg_load (void);
 void init_sounds (void);
 void free_sounds (void);
 
+void init_volume (void);
+void volume_set (int volume);
+void volume_up (void);
+void volume_down (void);

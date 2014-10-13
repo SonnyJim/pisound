@@ -1,9 +1,11 @@
 #include "pisound.h"
+#include "cfg.h"
+#include "volume.h"
 
-//Parse the cfg and load WAVs into memory
+//Parse the cfg and load WAVs/volume settings into memory
 int cfg_load (void)
 {
-    FILE *sound_list;
+    FILE *sound_list, *cfg_file;
     char cfg_line[1024];
     int sound_num;
     char *sound_file;
@@ -94,5 +96,32 @@ int cfg_load (void)
         }
     }
     fclose (sound_list);
+
+    //Load the general configuration
+    //Set some default values before attempting to load config
+    volume = DEFAULT_VOLUME;
+
+    if (verbose)
+        fprintf (stdout, "Attempting to load configuration file %s\n", DEFAULT_CFG_FILE);
+    cfg_file = fopen (DEFAULT_CFG_FILE, "r");
+    
+    if (cfg_file == NULL)
+        return errno;
+   
+    while (fgets (cfg_line, 1024, cfg_file) != NULL)
+    {
+        //Ignore remarks
+        if (cfg_line[0] != '#')
+        {
+            //Find the volume
+            if (strncmp (cfg_line, CFG_VOLUME, strlen(CFG_VOLUME)) == 0)
+            {
+                volume = atoi(cfg_line + strlen(CFG_VOLUME));
+                if (verbose)
+                    fprintf (stdout, "Reading volume from configuration file, %i\n", volume);
+            }
+        }
+    }
+    fclose (cfg_file);
     return 0;
 }

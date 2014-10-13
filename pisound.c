@@ -26,6 +26,7 @@ void init_sounds (void)
 
     music_requested = MUSIC_OFF;
     music_current = MUSIC_OFF;
+    
 }
 
 //Release the memory allocated to our sounds
@@ -41,11 +42,28 @@ void free_sounds (void)
     music_requested = MUSIC_OFF;
     music_current = MUSIC_OFF;
 }
+//Check the sound_queue and play sounds if needed
+void sound_check (void)
+{
+    int sound_code;
+    if (sound_queue.count > 0)
+    {
+        sound_code = sound_queue_read ();
+        if (verbose)
+            fprintf (stderr, "Playing sound_code %i\n", sound_code);
+        channel = Mix_PlayChannel(-1, sounds[sound_code], 0);
+        if(channel == -1)
+	        fprintf(stderr, "Warning: Unable to play WAV file: %s\n", Mix_GetError());
+    }
+}
 
 void music_check (void)
 {    
     if (music_current != music_requested)
     {
+        if (verbose)
+            fprintf (stdout, "Playing music_code %i\n", music_requested);
+
         music_current = music_requested;
         
         if (music_current == MUSIC_OFF)
@@ -55,47 +73,7 @@ void music_check (void)
     }
 }
 
-//Scale the volume range between SDL/WPC
-//0 - 128 vs 0 - 32
-void volume_set (int volume)
-{
-    if (verbose)
-        fprintf (stdout, "Setting volume %i\n", volume);
-}
-
-void volume_up (void)
-{
-    if (verbose)
-        fprintf (stdout, "Volume up\n");
-    if (volume < MAX_VOLUME)
-    {
-        volume++;
-        Mix_Volume (-1, volume * 8);    
-    }
-}
-
-void volume_down (void)
-{
-    if (verbose)
-        fprintf (stdout, "Volume down\n");
-    if (volume > 0)
-    {
-        volume--;
-        Mix_Volume (-1, volume * 8);  
-    }
-}
-
-void sound_check (void)
-{
-    if (sound_queue.count > 0)
-    {
-        channel = Mix_PlayChannel(-1, sounds[sound_queue_read ()], 0);
-        if(channel == -1)
-	        fprintf(stderr, "Warning: Unable to play WAV file: %s\n", Mix_GetError());
-    }
-}
-
-//Play some sounds
+//Main sound loop
 void play_sounds (void)
 {
     fprintf (stdout, "Audio thread started\n");
@@ -109,7 +87,7 @@ void play_sounds (void)
 //Read the GPIO
 void *gpio_thread(void *ptr)
 {
-    int i;
+    //int i;
     while (1)
     {
         /*
@@ -169,6 +147,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    //setup signal handler
+    if (signal(SIGINT, sig_handler) == SIG_ERR)
+        fprintf(stderr, "\ncan't catch SIGINT\n");
+ 
     //Initialize SDL audio
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
 		printf("Unable to initialize SDL: %s\n", SDL_GetError());
@@ -192,13 +174,12 @@ int main(int argc, char *argv[])
     
     //Initialise the sound_queue
     sound_queue_init ();
-
-    //setup signal handler
-    if (signal(SIGINT, sig_handler) == SIG_ERR)
-        fprintf(stderr, "\ncan't catch SIGINT\n");
-   
-    running = 1;
     
+    //Initialise volume
+    init_volume ();
+  
+    running = 1;
+   
     //Start the GPIO thread
     ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
     if (ret)

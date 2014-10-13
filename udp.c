@@ -9,6 +9,11 @@ static void udp_send_version (struct sockaddr_in cliaddr)
     sendto(sockfd, UDP_VERSION_STRING, strlen (UDP_VERSION_STRING),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
 }
 
+static void udp_send_cmd_error (struct sockaddr_in cliaddr)
+{
+    sendto(sockfd, UDP_CMD_ERROR, strlen (UDP_CMD_ERROR),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+}
+
 static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
 {
     int byte1, byte2;
@@ -25,6 +30,7 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
     if (strlen (msg) < 2)
     {
         fprintf (stderr, "Error in udp_decode_msg: empty message");
+        udp_send_cmd_error (cliaddr);
         return;
     }
     else if (strlen (msg) < 4 
@@ -32,11 +38,15 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
     {
         fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
         fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
+        udp_send_cmd_error (cliaddr);
         return;
     }
 
     if (byte1 > 255 || byte2 > 255)
+    {
+        udp_send_cmd_error (cliaddr);
         fprintf (stderr, "Error in udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
+    }
 
     if (verbose)
         fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
@@ -58,11 +68,15 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
         case UDP_VOLUME_DOWN:
             volume_down ();
             break;
+        case UDP_VOLUME_SET:
+            volume_set (byte2);
+            break;
         case UDP_VERSION:
             udp_send_version (cliaddr);
             break;
         default:
             fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
+            udp_send_cmd_error (cliaddr);
             break;
     }
 }
@@ -95,7 +109,7 @@ void* udp_thread (void *ptr)
            len = sizeof(cliaddr);
            n = recvfrom (sockfd, mesg, UDP_BUFFLEN, 0, (struct sockaddr *) &cliaddr,&len);
            //Echo request
-           sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+           //sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
            mesg[n] = 0;
            udp_decode_msg (mesg, cliaddr);
        }
