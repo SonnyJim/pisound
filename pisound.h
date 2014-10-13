@@ -16,6 +16,8 @@
 #define MAX_SOUNDS 255
 #define MAX_MUSIC 255
 
+#define DEFAULT_MAXVOICES 32
+
 //Command to stop music
 #define MUSIC_OFF 256
 
@@ -31,6 +33,7 @@ int music_current;
 
 //Music requested
 int music_requested;
+int max_voices;
 
 int running;
 int verbose;
@@ -50,7 +53,6 @@ pthread_t thread1, thread2;
 void* udp_thread (void *ptr);
 void* gpio_thread (void *ptr);
 
-
 int sound_queue_read (void);
 void sound_queue_init (void);
 void sound_queue_add (int sound_code);
@@ -69,3 +71,6 @@ void init_volume (void);
 void volume_set (int volume);
 void volume_up (void);
 void volume_down (void);
+
+int check_pid (void);
+int remove_pid (void);

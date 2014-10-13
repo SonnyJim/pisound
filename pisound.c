@@ -10,6 +10,7 @@ void sig_handler (int signo)
         free_sounds ();
 	    Mix_CloseAudio();
 	    SDL_Quit();	
+        remove_pid ();
         running = 0;
     }
 }
@@ -135,6 +136,7 @@ int main(int argc, char *argv[])
   
     verbose = 0;
     running = 0;
+ 
    
     //read command line arguments
     while ((c = getopt (argc, argv, "v")) != -1)
@@ -145,6 +147,13 @@ int main(int argc, char *argv[])
             verbose = 1;
             break;
         }
+    }
+
+    //Check PID file
+    if (check_pid () != 0)
+    {
+        fprintf (stderr, "Error opening or creating PID file\n");
+        return 1;
     }
 
     //setup signal handler
@@ -162,9 +171,8 @@ int main(int argc, char *argv[])
 		printf("Unable to initialize audio: %s\n", Mix_GetError());
 		return 1;
 	}
-	
-    
-    //Load sounds into array
+	 
+    //Load configuration and sounds in memory
     if (cfg_load () != 0)
     {
         fprintf (stderr, "An error occured reading the config file!\n");
@@ -172,12 +180,16 @@ int main(int argc, char *argv[])
         return 1;
     }
     
+    //Configure maximum amount of simultaenous voices
+    Mix_AllocateChannels(max_voices);
+    
     //Initialise the sound_queue
     sound_queue_init ();
     
     //Initialise volume
     init_volume ();
   
+
     running = 1;
    
     //Start the GPIO thread

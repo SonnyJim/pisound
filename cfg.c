@@ -100,6 +100,7 @@ int cfg_load (void)
     //Load the general configuration
     //Set some default values before attempting to load config
     volume = DEFAULT_VOLUME;
+    max_voices = DEFAULT_MAXVOICES;
 
     if (verbose)
         fprintf (stdout, "Attempting to load configuration file %s\n", DEFAULT_CFG_FILE);
@@ -119,6 +120,12 @@ int cfg_load (void)
                 volume = atoi(cfg_line + strlen(CFG_VOLUME));
                 if (verbose)
                     fprintf (stdout, "Reading volume from configuration file, %i\n", volume);
+            }
+            if (strncmp (cfg_line, CFG_MAXVOICES, strlen(CFG_MAXVOICES)) == 0)
+            {
+                max_voices = atoi(cfg_line + strlen(CFG_MAXVOICES));
+                if (verbose)
+                    fprintf (stdout, "Reading max_voices from configuration file, %i\n", max_voices);
             }
         }
     }
