@@ -101,6 +101,11 @@ int cfg_load (void)
     //Set some default values before attempting to load config
     volume = DEFAULT_VOLUME;
     max_voices = DEFAULT_MAXVOICES;
+    audio_channels = DEFAULT_AUDIO_CHANNELS;
+    //audio_format = DEFAULT_AUDIO_FORMAT;
+    audio_format = AUDIO_S16SYS;
+    audio_buffers = DEFAULT_AUDIO_BUFFERS;
+    audio_rate = DEFAULT_AUDIO_RATE;
 
     if (verbose)
         fprintf (stdout, "Attempting to load configuration file %s\n", DEFAULT_CFG_FILE);
@@ -121,11 +126,41 @@ int cfg_load (void)
                 if (verbose)
                     fprintf (stdout, "Reading volume from configuration file, %i\n", volume);
             }
+            
             if (strncmp (cfg_line, CFG_MAXVOICES, strlen(CFG_MAXVOICES)) == 0)
             {
                 max_voices = atoi(cfg_line + strlen(CFG_MAXVOICES));
                 if (verbose)
                     fprintf (stdout, "Reading max_voices from configuration file, %i\n", max_voices);
+            }
+
+            if (strncmp (cfg_line, CFG_AUDIO_CHANNELS, strlen(CFG_AUDIO_CHANNELS)) == 0)
+            {
+                audio_channels = atoi(cfg_line + strlen(CFG_AUDIO_CHANNELS));
+                if (verbose)
+                    fprintf (stdout, "Reading channels from configuration file, %i\n", audio_channels);
+            }
+            
+            if (strncmp (cfg_line, CFG_AUDIO_BUFFERS, strlen(CFG_AUDIO_BUFFERS)) == 0)
+            {
+                audio_buffers = atoi(cfg_line + strlen(CFG_AUDIO_BUFFERS));
+                if (verbose)
+                    fprintf (stdout, "Reading audio_buffers from configuration file, %i\n", audio_buffers);
+            }
+      
+            /*
+            if (strncmp (cfg_line, CFG_AUDIO_FORMAT, strlen(CFG_AUDIO_FORMAT)) == 0)
+            {
+                audio_format = atol (cfg_line + strlen(CFG_AUDIO_FORMAT));
+                if (verbose)
+                    fprintf (stdout, "Reading audio_format from configuration file, %i\n", audio_format);
+            }
+            */
+            if (strncmp (cfg_line, CFG_AUDIO_RATE, strlen(CFG_AUDIO_RATE)) == 0)
+            {
+                audio_rate = atoi(cfg_line + strlen(CFG_AUDIO_RATE));
+                if (verbose)
+                    fprintf (stdout, "Reading audio_rate from configuration file, %i\n", audio_rate);
             }
         }
     }

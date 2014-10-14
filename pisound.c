@@ -124,10 +124,6 @@ void *gpio_thread(void *ptr)
 
 int main(int argc, char *argv[])
 {
-	int audio_rate = 44100;
-	Uint16 audio_format = AUDIO_S16SYS;
-	int audio_channels = 1;
-	int audio_buffers = 4096;
     int ret, c;
 
     fprintf (stdout, "=========\n");

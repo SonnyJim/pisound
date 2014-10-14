@@ -21,12 +21,21 @@
 //Command to stop music
 #define MUSIC_OFF 256
 
+#define DEFAULT_AUDIO_RATE 44100
+#define DEFAULT_AUDIO_CHANNELS 2
+#define DEFAULT_AUDIO_FORMAT AUDIO_S16SYS
+#define DEFAULT_AUDIO_BUFFERS 2048
+
 //List of all the pointers to the sounds that can be called
 Mix_Chunk *sounds[MAX_SOUNDS + 1];
 Mix_Music *music[MAX_MUSIC + 1];
 
 //How many channels we use, currently mono
 int channel;
+int audio_rate;
+Uint16 audio_format;
+int audio_channels;
+int audio_buffers;
 
 //Currently playing music
 int music_current;
