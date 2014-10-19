@@ -37,6 +37,7 @@ void free_gfx (void)
     TTF_Quit();
 }
 
+//TODO This is ugly and makes baby jesus cry, fix it!
 char *render_score_to_string (long long score)
 {
     static char oldstring[255], newstring[255];
@@ -51,11 +52,14 @@ char *render_score_to_string (long long score)
 
     //Get the current and resulting string lengths
     len = strlen (oldstring);
-    newlen = len + (len / 3);
+    newlen = len + (len / 3) - 1;
+    if (newlen <= 0)
+        newlen = 1;
 
     //Don't forget the string terminator
     i = len + 1;
     j = newlen + 1;
+
     offset = 0;
 
     while (i != 0)
@@ -111,6 +115,7 @@ void* gfx_thread (void *ptr)
     SCREEN_WIDTH = videoInfo->current_w;
     SCREEN_HEIGHT = videoInfo->current_h;
     SCREEN_BPP = 32;
+    score = 0;
 
     if (verbose)
         fprintf (stdout, "Screen width = %i Screen height = %i\n", SCREEN_WIDTH, SCREEN_HEIGHT);
