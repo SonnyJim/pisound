@@ -66,6 +66,8 @@ def send_thread ():
             message = "0004"
         elif readkey == "p":
             message = "fe"
+        elif readkey == "t":
+            message = raw_input ("Enter in custom message: ")
         elif readkey == "q":
             running = 0;
 
@@ -82,6 +84,7 @@ print "s send sound"
 print "m send music"
 print "v set volume"
 print "p ping!"
+print "t send custom message"
 print "q quit"
 
 thread.start_new_thread (recv_thread, ())
