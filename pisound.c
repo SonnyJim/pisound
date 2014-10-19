@@ -5,13 +5,15 @@ void sig_handler (int signo)
     if (signo == SIGINT)
     { 
         fprintf (stdout, "\nSIGINT detected, shutting down\n");
-        pthread_cancel (thread1);
-        pthread_cancel (thread2);
+        //pthread_cancel (thread1);
+        //pthread_cancel (thread2);
+        //pthread_cancel (thread3);
+        running = 0;
         free_sounds ();
+        free_gfx ();
 	    Mix_CloseAudio();
 	    SDL_Quit();	
         remove_pid ();
-        running = 0;
     }
 }
 
@@ -88,10 +90,17 @@ void play_sounds (void)
 //Read the GPIO
 void *gpio_thread(void *ptr)
 {
-    //int i;
+    while (running)
+    {
+        //To stop the compiler complaining
+        if (1 == 0)
+            return NULL;
+    }
+
+        /*
+    int i;
     while (1)
     {
-        /*
         for (i = 0; i < 5; i++)
         {
             music_requested = i;
@@ -102,8 +111,6 @@ void *gpio_thread(void *ptr)
             music_requested = MUSIC_OFF;
             sleep (2);
         }
-        */
-        /*
 
         //Decode sound_code from GPIO
         switch (sound_code)
@@ -118,8 +125,9 @@ void *gpio_thread(void *ptr)
                 music_requested = MUSIC_OFF;
                 break;
         }
-        */
     }
+        */
+    return NULL;
 }
 
 int main(int argc, char *argv[])
@@ -132,15 +140,19 @@ int main(int argc, char *argv[])
   
     verbose = 0;
     running = 0;
+    cfg_gfx_engine = 0;
  
    
     //read command line arguments
-    while ((c = getopt (argc, argv, "v")) != -1)
+    while ((c = getopt (argc, argv, "vg")) != -1)
     {
         switch (c)
         {
         case 'v':
             verbose = 1;
+            break;
+        case 'g':
+            cfg_gfx_engine = 1;
             break;
         }
     }
@@ -161,13 +173,13 @@ int main(int argc, char *argv[])
 		printf("Unable to initialize SDL: %s\n", SDL_GetError());
 		return 1;
 	}
-	
+
 	//Initialize SDL_mixer with our chosen audio settings
 	if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
 		printf("Unable to initialize audio: %s\n", Mix_GetError());
 		return 1;
 	}
-	 
+	
     //Load configuration and sounds in memory
     if (cfg_load () != 0)
     {
@@ -184,7 +196,6 @@ int main(int argc, char *argv[])
     
     //Initialise volume
     init_volume ();
-  
 
     running = 1;
    
@@ -204,7 +215,18 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Error creating udp_thread: %i\n",ret);
     }
     else
-        fprintf (stdout, "UDP thread started\n");
+ 
+    //Start the gfx thread
+    if (cfg_gfx_engine)
+    {
+        ret = pthread_create (&thread3, NULL, gfx_thread, NULL);
+        if (ret)
+        {
+            fprintf(stderr,"Error creating gfx_thread: %i\n",ret);
+        }
+        else
+            fprintf (stdout, "GFX thread started\n");
+    }
 
     //Start main audio thread
     play_sounds ();

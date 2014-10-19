@@ -1,15 +1,19 @@
-//const int SCREEN_WIDTH = 1024;
-//const int SCREEN_HEIGHT = 600;
-//const int SCREEN_BPP = 16;
 #include <SDL/SDL_ttf.h>
 
-#define DEFAULT_FONT "fonts/lazy.ttf"
+#define SCORE_SEPARATOR ','
+#define TEST_SCORE "1,234,567,890"
+#define MAX_FONTS 255
+#define CFG_FONT_FILE "fonts.cfg"
 
-SDL_Surface *message = NULL; 
-SDL_Surface *background = NULL; 
-SDL_Surface *screen = NULL;
+SDL_Surface *score; 
+SDL_Surface *background; 
+SDL_Surface *screen;
 
-TTF_Font *font = NULL;
+TTF_Font *fonts[255];
 SDL_Color textColor;
 
+int SCREEN_HEIGHT;
+int SCREEN_WIDTH;
+int SCREEN_BPP;
 
+int load_fonts (void);

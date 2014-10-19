@@ -162,6 +162,10 @@ int cfg_load (void)
                 if (verbose)
                     fprintf (stdout, "Reading audio_rate from configuration file, %i\n", audio_rate);
             }
+            if (strncmp (cfg_line, CFG_GFX_ENGINE, strlen(CFG_GFX_ENGINE)) == 0)
+            {
+                cfg_gfx_engine = atoi(cfg_line + strlen (CFG_GFX_ENGINE));
+            }
         }
     }
     fclose (cfg_file);
