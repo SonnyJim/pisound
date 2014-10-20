@@ -1,13 +1,14 @@
 #include <SDL2/SDL_ttf.h>
+#include <locale.h> //Used to set locale for score separator
 
-#define SCORE_SEPARATOR ','
-#define TEST_SCORE "1,234,567,890"
+//#define SCORE_SEPARATOR ','
 #define MAX_FONTS 255
 #define CFG_FONT_FILE "fonts.cfg"
 
 SDL_Surface *score_srf; 
+SDL_Surface *score_outline_srf; 
 SDL_Texture *score_tex; 
-SDL_Texture *score_outline; 
+SDL_Texture *score_outline_tex; 
 SDL_Rect    score_rect;
 SDL_Surface *background_srf; 
 SDL_Texture *background_tex; 
@@ -27,5 +28,4 @@ int load_fonts (void);
 
 int player_num;
 long long score;
-
-int transparency, direction;
+long long old_score;

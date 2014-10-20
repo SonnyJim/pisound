@@ -43,7 +43,8 @@ int check_pid (void)
         }
         else
         {
-            //pidfile exists but process is no longer active, so we can remove the pid file
+            if (verbose)
+                fprintf (stdout, "PID %d is no longer running, removing PID file and generating new one\n", oldpid);
             fclose(fd);
             remove (PIDFILE);
         }

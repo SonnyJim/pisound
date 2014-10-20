@@ -1,5 +1,6 @@
 #include "pisound.h"
 #include "gfx.h"
+
 //#include "bcm_host.h"
 
 void free_gfx (void) 
@@ -20,61 +21,11 @@ void free_gfx (void)
     TTF_Quit();
 }
 
-//TODO This is ugly and makes baby jesus cry, fix it!
 char *render_score_to_string (long long score)
 {
-    static char oldstring[255], newstring[255];
-    int len, newlen, i, j, offset;
-
-    //Clear both strings
-    memset (oldstring, 0, 255);
-    memset (newstring, 0, 255);
-
-    //Convert the score to a string
-    sprintf (oldstring, "%lld", score);
-
-    //Get the current and resulting string lengths
-    len = strlen (oldstring);
-    newlen = len + (len / 3) - 1;
-    if (newlen <= 0)
-        newlen = 1;
-
-    //Don't forget the string terminator
-    i = len + 1;
-    j = newlen + 1;
-
-    offset = 0;
-
-    while (i != 0)
-    {
-        i--;
-        j--;
-        newstring[j] = oldstring[i];
-        if (offset == 3)
-        {
-            offset = 0;
-            j--;
-            newstring[j] = SCORE_SEPARATOR;
-        }
-        offset++;
-    }
+    static char newstring[255];
+    sprintf (newstring, "%'lld", score);
     return newstring;
-}
-
-static void fade_func (void)
-{
-    if (direction)
-    {
-        transparency++;
-        if (transparency >= 255)
-            direction = 0;
-    }
-    else
-    {
-        transparency--;
-        if (transparency <= 0)
-            direction = 1;
-    }
 }
 
 static void render_score (void)
@@ -88,7 +39,8 @@ static void render_score (void)
     //I wanted a braaahn baby
     textColor = (SDL_Color) { 82, 42, 0};
     score_srf = TTF_RenderText_Solid( fonts[0], score_string, textColor );
-    //SDL_SetAlpha (score_srf, SDL_SRCALPHA, 128);
+    textColor = (SDL_Color) { 42, 22, 0};
+    score_outline_srf = TTF_RenderText_Solid( fonts[1], score_string, textColor );
     TTF_SizeText (fonts[0], score_string, &textWidth, &textHeight);
     xpos = (SCREEN_WIDTH - textWidth) / 2;
     //ypos = (SCREEN_HEIGHT - textHeight) / 2;
@@ -103,13 +55,17 @@ static void render_score (void)
         fprintf (stderr, "Error rendering score_srf %s\n", SDL_GetError());
     
     score_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
-    fade_func ();
+    score_outline_tex = SDL_CreateTextureFromSurface(renderer, score_outline_srf);
     SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
-    SDL_SetTextureAlphaMod (score_tex, transparency);
+    SDL_SetTextureBlendMode (score_outline_tex, SDL_BLENDMODE_BLEND);    
+    SDL_SetTextureAlphaMod (score_tex, 150);
+    SDL_SetTextureAlphaMod (score_outline_tex, 190);
 
     if (score_tex != NULL)
     {
         SDL_FreeSurface (score_srf);
+        SDL_FreeSurface (score_outline_srf);
+        SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
         SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
     }
     else
@@ -123,7 +79,10 @@ void* gfx_thread (void *ptr)
     //Needed on the Pi to initialise the GPU
     //bcm_host_init ();
     load_fonts ();
-    direction = 1;
+
+    //Set locale for thousand separator in render_score
+    setlocale(LC_NUMERIC, "");
+
     if (SDL_Init (SDL_INIT_VIDEO) != 0)
     {
         fprintf (stderr, "\nError initialising SDL video: %s\n", SDL_GetError ());
@@ -177,7 +136,7 @@ void* gfx_thread (void *ptr)
     SDL_RenderCopy (renderer, background_tex, NULL, NULL);
     while (running)
     {
-    //    SDL_RenderCopy (renderer, background_tex, NULL, NULL);
+        SDL_RenderCopy (renderer, background_tex, NULL, NULL);
         render_score ();
         SDL_RenderPresent (renderer);
     }
