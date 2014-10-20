@@ -11,13 +11,18 @@
 #define UDP_VOLUME_DOWN 0x04
 #define UDP_VOLUME_SET  0x05
 
+//Message format:
+//send UDP_SCORE_START, followed by the player score as a string, then UDP_SCORE_END
+#define UDP_SCORE_START 0xe0
+#define UDP_SCORE_END   0xe1
+
 #define UDP_PING        0xfe
 #define UDP_PONG        "PONG"
 #define UDP_VERSION     0xff
 #define UDP_VERSION_STRING "Pisound V0.1"
 
 #define UDP_PORT 8008
-#define UDP_BUFFLEN 16
+#define UDP_BUFFLEN 256
 
 //Sent to client when an error occurs
 #define UDP_CMD_ERROR "ERROR"

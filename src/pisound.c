@@ -5,9 +5,6 @@ void sig_handler (int signo)
     if (signo == SIGINT)
     { 
         fprintf (stdout, "\nSIGINT detected, shutting down\n");
-        //pthread_cancel (thread1);
-        //pthread_cancel (thread2);
-        //pthread_cancel (thread3);
         running = 0;
         free_sounds ();
         free_gfx ();

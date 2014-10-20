@@ -7,8 +7,8 @@
 #include <signal.h>
 #include <getopt.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_mixer.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 #define SOUND_QUEUE_SIZE 16
 #define QUEUE_POS_EMPTY 256

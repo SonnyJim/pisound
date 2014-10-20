@@ -4,6 +4,8 @@
 #include "pisound.h"
 #include "udp.h"
 
+#include "gfx.h"
+
 static void udp_send_pong (struct sockaddr_in cliaddr)
 {
     sendto(sockfd, UDP_PONG, strlen (UDP_PONG),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
@@ -17,6 +19,12 @@ static void udp_send_version (struct sockaddr_in cliaddr)
 static void udp_send_cmd_error (struct sockaddr_in cliaddr)
 {
     sendto(sockfd, UDP_CMD_ERROR, strlen (UDP_CMD_ERROR),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+}
+
+static void udp_score_receive (char *msg)
+{
+    score = strtoll (msg + 1, NULL, 10);
+    fprintf (stdout, "Score set to %lld\n", score);
 }
 
 static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
@@ -82,6 +90,9 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
         case UDP_VERSION:
             udp_send_version (cliaddr);
             break;
+        case UDP_SCORE_START:
+            udp_score_receive (msg);
+            break;
         default:
             fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
             udp_send_cmd_error (cliaddr);
@@ -120,6 +131,7 @@ void* udp_thread (void *ptr)
            //sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
            mesg[n] = 0;
            udp_decode_msg (mesg, cliaddr);
+           memset (mesg, 0, sizeof(mesg));
        }
    }
    if (verbose)

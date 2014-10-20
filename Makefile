@@ -1,8 +1,9 @@
 CC	= gcc
-INCLUDE	= -I/usr/include
+INCLUDE	= -I/usr/local/include 
+GLES_INCLUDE = -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads/ -I/opt/vc/include/interface/vmcs_host/linux/
 CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe -std=gnu99 -O3
-LDFLAGS	= -L/usr/lib 
-LDLIBS	= -lSDL -lSDL_mixer -lSDL_ttf -lpthread
+LDFLAGS	= -L/usr/local/lib -L/opt/vc/lib
+LDLIBS	= -lSDL2 -lSDL2_mixer -lSDL2_ttf -lpthread -lbcm_host
 OBJS = src/pisound.o src/queue.o src/cfg.o src/udp.o src/volume.o src/pidfile.o src/gfx.o src/gfx_font.o
 
 all: pisound
