@@ -18,6 +18,8 @@
 
 #define DEFAULT_MAXVOICES 32
 
+#define MAX_PLAYERS 6
+
 //Command to stop music
 #define MUSIC_OFF 256
 

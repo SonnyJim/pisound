@@ -36,42 +36,55 @@ static void render_score (void)
     
     score_string = render_score_to_string (score);
 
-    //I wanted a braaahn baby
-    textColor = (SDL_Color) { 82, 42, 0};
-    score_srf = TTF_RenderText_Solid( fonts[0], score_string, textColor );
-    textColor = (SDL_Color) { 42, 22, 0};
-    score_outline_srf = TTF_RenderText_Solid( fonts[1], score_string, textColor );
     TTF_SizeText (fonts[0], score_string, &textWidth, &textHeight);
     xpos = (SCREEN_WIDTH - textWidth) / 2;
-    //ypos = (SCREEN_HEIGHT - textHeight) / 2;
-    ypos = 100;
+    ypos = 120;
 
     score_rect.x = xpos;
     score_rect.y = ypos;
     score_rect.w = textWidth;
     score_rect.h = textHeight;
-    
-    if (score_srf == NULL)
-        fprintf (stderr, "Error rendering score_srf %s\n", SDL_GetError());
-    
+   
+    //Inner text
+    textColor = (SDL_Color) { 82, 42, 0};
+    score_srf = TTF_RenderText_Solid( fonts[0], score_string, textColor );
     score_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
-    score_outline_tex = SDL_CreateTextureFromSurface(renderer, score_outline_srf);
+    SDL_FreeSurface (score_srf);
     SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
-    SDL_SetTextureBlendMode (score_outline_tex, SDL_BLENDMODE_BLEND);    
     SDL_SetTextureAlphaMod (score_tex, 150);
-    SDL_SetTextureAlphaMod (score_outline_tex, 190);
+    SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
+    
+    //Outline
+    textColor = (SDL_Color) { 42, 22, 0};
+    score_srf = TTF_RenderText_Solid( fonts[1], score_string, textColor );
+    score_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
+    SDL_FreeSurface (score_srf);
+    SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
+    SDL_SetTextureAlphaMod (score_tex, 200);
+    SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
 
-    if (score_tex != NULL)
-    {
-        SDL_FreeSurface (score_srf);
-        SDL_FreeSurface (score_outline_srf);
-        SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
-        SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
-    }
-    else
-    {
-        fprintf (stderr, "Error rendering score_text: %s\n", SDL_GetError());
-    }
+    //Render player number
+    sprintf (score_string, "Player %d", player_num);
+    TTF_SizeText (fonts[2], score_string, &textWidth, &textHeight);
+
+    xpos = (SCREEN_WIDTH - textWidth) / 2;
+    ypos = 80;
+
+    score_rect.x = xpos;
+    score_rect.y = ypos;
+    score_rect.w = textWidth;
+    score_rect.h = textHeight;
+
+    textColor = (SDL_Color) { 0, 0, 0};
+    score_srf = TTF_RenderText_Solid( fonts[2], score_string, textColor );
+    score_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
+    SDL_FreeSurface (score_srf);
+    SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
+    SDL_SetTextureAlphaMod (score_tex, 200);
+    SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
+
+
+   
 }
 
 void* gfx_thread (void *ptr)
@@ -79,6 +92,8 @@ void* gfx_thread (void *ptr)
     //Needed on the Pi to initialise the GPU
     //bcm_host_init ();
     load_fonts ();
+    
+    player_num = 1;
 
     //Set locale for thousand separator in render_score
     setlocale(LC_NUMERIC, "");

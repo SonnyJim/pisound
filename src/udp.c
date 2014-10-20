@@ -27,6 +27,16 @@ static void udp_score_receive (char *msg)
     fprintf (stdout, "Score set to %lld\n", score);
 }
 
+static void udp_player_num (int num)
+{
+    if (num > 0 && num <= MAX_PLAYERS)
+    {
+        player_num = num;
+    }
+    else
+        fprintf (stderr, "Error: udp_player_num out of range\n");
+}
+
 static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
 {
     int byte1, byte2;
@@ -90,8 +100,11 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
         case UDP_VERSION:
             udp_send_version (cliaddr);
             break;
-        case UDP_SCORE_START:
+        case UDP_SCORE:
             udp_score_receive (msg);
+            break;
+        case UDP_PLAYER_NUM:
+            udp_player_num (byte2);
             break;
         default:
             fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);

@@ -12,9 +12,9 @@
 #define UDP_VOLUME_SET  0x05
 
 //Message format:
-//send UDP_SCORE_START, followed by the player score as a string, then UDP_SCORE_END
-#define UDP_SCORE_START 0xe0
-#define UDP_SCORE_END   0xe1
+//send UDP_SCORE_START, followed by the player score as a string
+#define UDP_SCORE       0xe0
+#define UDP_PLAYER_NUM  0xe1
 
 #define UDP_PING        0xfe
 #define UDP_PONG        "PONG"
