@@ -4,7 +4,7 @@ INCLUDE	= -I/usr/local/include
 #GLESLIBS = -L/opt/vc/lib
 CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe -std=gnu99 -O3
 LDFLAGS	= -L/usr/local/lib 
-LDLIBS	= -lSDL2 -lSDL2_mixer -lSDL2_ttf -lpthread
+LDLIBS	= -lSDL2 -lSDL2_mixer -lSDL2_ttf -lSDL2_image -lpthread
 OBJS = src/pisound.o src/queue.o src/cfg.o src/udp.o src/volume.o src/pidfile.o src/gfx.o src/gfx_font.o
 
 all: pisound
