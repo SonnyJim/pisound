@@ -5,12 +5,11 @@ void sig_handler (int signo)
     if (signo == SIGINT)
     { 
         fprintf (stdout, "\nSIGINT detected, shutting down\n");
-        running = 0;
         free_sounds ();
-        free_gfx ();
 	    Mix_CloseAudio();
-	    SDL_Quit();	
         remove_pid ();
+        running = 0;
+	    SDL_Quit();	
     }
 }
 
@@ -144,6 +143,12 @@ int main(int argc, char *argv[])
         case 'g':
             cfg_gfx_engine = 1;
             break;
+        case '?':
+            if (isprint (optopt))
+                fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+            return 1;
+        default:
+            return 1;
         }
     }
 

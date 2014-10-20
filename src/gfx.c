@@ -31,8 +31,10 @@ static void render_score (void)
     int textWidth, textHeight, xpos, ypos;
     char *score_string;
     SDL_Color textColor;
-   
-    if (score != old_score)
+  
+    //Only update the score if it has changed
+    if (score != old_score)// || 
+           // (score == 0 && old_score == 0))
     {
         score_string = render_score_to_string (score);
         TTF_SizeText (fonts[0], score_string, &textWidth, &textHeight);
@@ -73,7 +75,7 @@ static void render_score (void)
         TTF_SizeText (fonts[2], score_string, &textWidth, &textHeight);
 
         xpos = (SCREEN_WIDTH - textWidth) / 2;
-        ypos = 80;
+        ypos = 85;
         
         player_rect.x = xpos;
         player_rect.y = ypos;
@@ -91,49 +93,118 @@ static void render_score (void)
     SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
 }
 
+SDL_Texture* load_image_to_texture (char *filename)
+{
+    SDL_Texture* dst_texture = NULL;
+
+    if (verbose)
+        fprintf (stdout, "Loading %s\n", filename);
+    sprite_srf = IMG_Load(filename);
+    
+    if (sprite_srf == NULL)
+        fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
+    else
+    {
+        dst_texture = SDL_CreateTextureFromSurface (renderer, sprite_srf);
+        if (dst_texture == NULL)
+            fprintf (stderr, "Error loading image to texture: %s %s\n", filename, SDL_GetError());
+        SDL_FreeSurface (sprite_srf);
+    }
+    return dst_texture;
+}
+
 void load_gfx (void)
 {
-    //sprite_srf = NULL;
+    sprite_srf = IMG_Load("images/shaving.png");
+    if (sprite_srf == NULL)
+        fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
+    sprite_tex = SDL_CreateTextureFromSurface (renderer, sprite_srf);
+    SDL_FreeSurface (sprite_srf);
+    sprite_srf = NULL;
+    SDL_QueryTexture (sprite_tex, NULL, NULL, &sprite_rect.w, &sprite_rect.h);
+
+    sprite_srf = IMG_Load("images/hbb_logo.png");
+    if (sprite_srf == NULL)
+        fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
+    logo_tex = SDL_CreateTextureFromSurface (renderer, sprite_srf);
+    SDL_FreeSurface (sprite_srf);
+    sprite_srf = NULL;
+    SDL_QueryTexture (logo_tex, NULL, NULL, &logo_rect.w, &logo_rect.h);
+
+    billybob_tex = load_image_to_texture (IMG_BILLYBOB);
+    SDL_QueryTexture (billybob_tex, NULL, NULL, &billybob_rect.w, &billybob_rect.h);
+    
+    bubba_tex = load_image_to_texture (IMG_BUBBA);
+    SDL_QueryTexture (bubba_tex, NULL, NULL, &bubba_rect.w, &bubba_rect.h);
+
+    grandpa_tex = load_image_to_texture (IMG_GRANDPA);
+    SDL_QueryTexture (grandpa_tex, NULL, NULL, &grandpa_rect.w, &grandpa_rect.h);
+
+    peggysue_tex = load_image_to_texture (IMG_PEGGYSUE);
+    SDL_QueryTexture (peggysue_tex, NULL, NULL, &peggysue_rect.w, &peggysue_rect.h);
 }
 
 void render_sprite (void)
 {
-    sprite_srf = IMG_Load("images/shavings1.png");
-    if (sprite_srf == NULL)
-        fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
-    sprite_tex = SDL_CreateTextureFromSurface (renderer, sprite_srf);
-    //SDL_FreeSurface (sprite_srf);
-    sprite_rect.x = SCREEN_WIDTH / 2;
-    sprite_rect.y = SCREEN_HEIGHT / 2;
-    sprite_rect.w = SCREEN_WIDTH;
-    sprite_rect.h = SCREEN_HEIGHT;
+    if (x_up)
+        sprite_x -= 2;
+    else
+        sprite_x += 2;
+    
+    if (sprite_x >= SCREEN_WIDTH - sprite_rect.w)
+        x_up = 1;
+    else if (sprite_x <= 0)
+        x_up = 0;
+    sprite_y = SCREEN_HEIGHT /2 + 100;
+
+    sprite_rect.x = sprite_x;
+    sprite_rect.y = sprite_y;
     SDL_RenderCopy (renderer, sprite_tex, NULL, &sprite_rect);
 }
 
-void* gfx_thread (void *ptr)
-{
-    //Needed on the Pi to initialise the GPU
-    //bcm_host_init ();
-    load_fonts ();
-    load_gfx ();
-   
-    old_player_num = 0;
-    player_num = 1;
-    old_score = 1;
+double rotate_angle;
 
-    //Set locale for thousand separator in render_score
-    setlocale(LC_NUMERIC, "");
+void render_logo (void)
+{
+    logo_rect.x = (SCREEN_WIDTH - logo_rect.w) / 2;
+    logo_rect.y = ((SCREEN_HEIGHT - logo_rect.h) / 2) + 40;
+
+    billybob_rect.x = 0;
+    billybob_rect.y = 0;
+    
+    bubba_rect.x = SCREEN_WIDTH - bubba_rect.w;
+    bubba_rect.y = 0;
+
+    grandpa_rect.x = SCREEN_WIDTH - grandpa_rect.w;
+    grandpa_rect.y = SCREEN_HEIGHT -  grandpa_rect.h;
+
+    peggysue_rect.x = 0;
+    peggysue_rect.y = SCREEN_HEIGHT -  peggysue_rect.h;
+
+    if (++rotate_angle >= 360)
+        rotate_angle = 0;
+    SDL_RenderCopyEx (renderer, logo_tex, NULL, &logo_rect, rotate_angle, NULL, 0);
+    SDL_RenderCopyEx (renderer, billybob_tex, NULL, &billybob_rect, rotate_angle, NULL, 0);
+    SDL_RenderCopyEx (renderer, bubba_tex, NULL, &bubba_rect, 360 - rotate_angle, NULL, 0);
+    SDL_RenderCopyEx (renderer, grandpa_tex, NULL, &grandpa_rect, rotate_angle, NULL, 0);
+    SDL_RenderCopyEx (renderer, peggysue_tex, NULL, &peggysue_rect, 360 - rotate_angle, NULL, 0);
+}
+
+int init_screen (void)
+{
+    int i, numdrivers;
+    SDL_RendererInfo drinfo; 
 
     if (SDL_Init (SDL_INIT_VIDEO) != 0)
     {
         fprintf (stderr, "\nError initialising SDL video: %s\n", SDL_GetError ());
-        pthread_exit (NULL);
+        return 1;
     }
     
     if (SDL_GetCurrentDisplayMode (0, &videomode) != 0)
     {
         fprintf (stderr, "Error getting current display mode: %s\n", SDL_GetError ());
-        pthread_exit (NULL);
+        return 1;
     }
     
     SCREEN_WIDTH = videomode.w;
@@ -146,16 +217,78 @@ void* gfx_thread (void *ptr)
     if (window == NULL)
     {
         fprintf (stderr, "Error creating window: %s\n", SDL_GetError());
-        pthread_exit (NULL);
+        return 1;
     }
-    
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+
+    numdrivers = SDL_GetNumRenderDrivers ();
+
+    if (verbose)
+    {
+        fprintf (stdout, "Found %i render drivers\n", numdrivers);
+        for (i = 0; i < numdrivers; i++)
+        {
+            SDL_GetRenderDriverInfo (i, &drinfo);
+            fprintf (stdout, "Driver %i: %s\n", i, drinfo.name);
+        }
+    }
+
+    //Try all the different SDL2 drivers until we find one that works ;-)
+    for (i = 0; i < numdrivers; i++)
+    {
+        if (verbose)
+            fprintf (stdout, "Trying render driver %i\n", i);
+        renderer = SDL_CreateRenderer(window, i, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        
+        if (renderer == NULL)
+            fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
+        else
+            break;
+    }
+
     if (renderer == NULL)
     {
-        fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
-        pthread_exit (NULL);
+        fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
+        renderer = SDL_CreateRenderer(window, 2, SDL_RENDERER_SOFTWARE);
+        if (renderer == NULL)
+            return 1;
     }
     
+    SDL_GetRenderDriverInfo (i, &drinfo);
+    fprintf (stdout, "Using %s\n", drinfo.name);
+    return 0;
+}
+
+void init_gfx_vars (void)
+{
+    old_player_num = 0;
+    player_num = 1;
+    old_score = 1;
+
+    sprite_x = 0;
+    sprite_y = 0;
+    x_up = 0;
+    y_up = 0;
+    rotate_angle = 0;
+}
+
+void* gfx_thread (void *ptr)
+{
+
+
+    //Set locale for thousand separator in render_score
+    setlocale(LC_NUMERIC, "");
+
+    if (init_screen () != 0)
+    {
+        fprintf (stderr, "Error setting up screen\n");
+        pthread_exit (NULL);
+    }
+
+   //Load all the resources we want to use
+    load_gfx ();
+    load_fonts ();
+    init_gfx_vars ();
+
     background_srf = SDL_LoadBMP("images/background.bmp");
     if (background_srf == NULL)
     {
@@ -172,14 +305,27 @@ void* gfx_thread (void *ptr)
     
     SDL_FreeSurface (background_srf);
     background_srf = NULL;
-    
+  
+    fpsFrames = 0;
+    fpsStart = SDL_GetTicks ();
     while (running)
     {
+        SDL_RenderClear(renderer);
         SDL_RenderCopy (renderer, background_tex, NULL, NULL);
         render_score ();
-        //render_sprite ();
+        render_logo ();
+        render_sprite ();
         SDL_RenderPresent (renderer);
+        
+        if (verbose)
+        {
+            fpsFrames++;
+            fpsAvg = (fpsFrames / (float) (SDL_GetTicks () - fpsStart)) * 1000;
+            if (fpsFrames % 1000 == 0)
+                fprintf (stdout, "Average FPS = %f\n", fpsAvg);
+        }
     }
+    free_gfx ();
     pthread_exit (NULL);
     return NULL;
 }
