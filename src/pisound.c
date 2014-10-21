@@ -9,6 +9,7 @@ void sig_handler (int signo)
 	    Mix_CloseAudio();
         remove_pid ();
         running = 0;
+        free_gfx ();
 	    SDL_Quit();	
     }
 }
@@ -121,7 +122,7 @@ void *gpio_thread(void *ptr)
 
 int main(int argc, char *argv[])
 {
-    int ret, c;
+    int ret;
 
     fprintf (stdout, "=========\n");
     fprintf (stdout, "|PiSound|\n");
@@ -129,29 +130,7 @@ int main(int argc, char *argv[])
   
     verbose = 0;
     running = 0;
-    cfg_gfx_engine = 0;
- 
-   
-    //read command line arguments
-    while ((c = getopt (argc, argv, "vg")) != -1)
-    {
-        switch (c)
-        {
-        case 'v':
-            verbose = 1;
-            break;
-        case 'g':
-            cfg_gfx_engine = 1;
-            break;
-        case '?':
-            if (isprint (optopt))
-                fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-            return 1;
-        default:
-            return 1;
-        }
-    }
-
+    
     //Check PID file
     if (check_pid () != 0)
     {
@@ -159,6 +138,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    if (getopts (argc, argv) != 0)
+        return 1;
+    
     //setup signal handler
     if (signal(SIGINT, sig_handler) == SIG_ERR)
         fprintf(stderr, "\ncan't catch SIGINT\n");

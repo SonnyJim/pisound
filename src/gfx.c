@@ -123,12 +123,7 @@ void load_gfx (void)
     sprite_srf = NULL;
     SDL_QueryTexture (sprite_tex, NULL, NULL, &sprite_rect.w, &sprite_rect.h);
 
-    sprite_srf = IMG_Load("images/hbb_logo.png");
-    if (sprite_srf == NULL)
-        fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
-    logo_tex = SDL_CreateTextureFromSurface (renderer, sprite_srf);
-    SDL_FreeSurface (sprite_srf);
-    sprite_srf = NULL;
+    logo_tex = load_image_to_texture ("images/hbb_logo.png");
     SDL_QueryTexture (logo_tex, NULL, NULL, &logo_rect.w, &logo_rect.h);
 
     billybob_tex = load_image_to_texture (IMG_BILLYBOB);
@@ -211,6 +206,18 @@ void render_heads (void)
     SDL_RenderCopyEx (renderer, bubba_tex, NULL, &bubba_rect, 360 - rotate_angle, NULL, 0);
     SDL_RenderCopyEx (renderer, grandpa_tex, NULL, &grandpa_rect, rotate_angle, NULL, 0);
     SDL_RenderCopyEx (renderer, peggysue_tex, NULL, &peggysue_rect, 360 - rotate_angle, NULL, 0);
+}
+
+void show_pisound_logo (void)
+{
+
+    logo_tex = load_image_to_texture ("images/pisound_logo.png");
+    SDL_QueryTexture (logo_tex, NULL, NULL, &logo_rect.w, &logo_rect.h);
+    
+    SDL_RenderClear (renderer);    
+    SDL_RenderCopy (renderer, logo_tex, NULL, NULL);
+    SDL_RenderPresent (renderer);
+    SDL_Delay (3000);
 }
 
 int init_screen (void)
@@ -310,6 +317,9 @@ void* gfx_thread (void *ptr)
         pthread_exit (NULL);
     }
 
+    if (cfg_show_logo)
+        show_pisound_logo ();
+
    //Load all the resources we want to use
     load_gfx ();
     load_fonts ();
@@ -331,9 +341,12 @@ void* gfx_thread (void *ptr)
     
     SDL_FreeSurface (background_srf);
     background_srf = NULL;
-  
-    fpsFrames = 0;
-    fpsStart = SDL_GetTicks ();
+    
+    if (cfg_show_fps)
+    {
+        fpsFrames = 0;
+        fpsStart = SDL_GetTicks ();
+    }
     while (running)
     {
         SDL_RenderClear(renderer);
@@ -344,16 +357,13 @@ void* gfx_thread (void *ptr)
         //render_sprite ();
         SDL_RenderPresent (renderer);
         
-        if (verbose)
+        if (cfg_show_fps)
         {
             fpsFrames++;
             fpsAvg = (fpsFrames / (float) (SDL_GetTicks () - fpsStart)) * 1000;
             if (fpsFrames % 1000 == 0)
                 fprintf (stdout, "Average FPS = %f\n", fpsAvg);
         }
-        score++;
     }
-    free_gfx ();
-    pthread_exit (NULL);
     return NULL;
 }

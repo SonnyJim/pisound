@@ -10,6 +10,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
+#include "cfg.h"
+
 #define SOUND_QUEUE_SIZE 16
 #define QUEUE_POS_EMPTY 256
 
@@ -50,7 +52,6 @@ int running;
 int verbose;
 int volume;
 
-int cfg_gfx_engine;
 
 //sound queue
 struct sound_queue_t {

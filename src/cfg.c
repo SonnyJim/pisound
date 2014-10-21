@@ -1,5 +1,4 @@
 #include "pisound.h"
-#include "cfg.h"
 #include "volume.h"
 
 //Parse the cfg and load WAVs/volume settings into memory
@@ -10,7 +9,7 @@ int cfg_load (void)
     int sound_num;
     char *sound_file;
     int len;
-    const char delim[1] = "=";
+    const char delim[] = "=";
 
     //Initilise sound array
     init_sounds ();
