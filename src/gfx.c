@@ -162,12 +162,36 @@ void render_sprite (void)
     SDL_RenderCopy (renderer, sprite_tex, NULL, &sprite_rect);
 }
 
-double rotate_angle;
+int scale, bigger;
+SDL_Rect zoom_rect;
 
 void render_logo (void)
 {
-    logo_rect.x = (SCREEN_WIDTH - logo_rect.w) / 2;
-    logo_rect.y = ((SCREEN_HEIGHT - logo_rect.h) / 2) + 40;
+    if (bigger)
+    {
+        if (++scale > 200)
+            bigger = 0;
+        
+    }
+    else
+    {
+        if (--scale <= 0)
+            bigger = 1;
+    }
+
+    zoom_rect.x = (SCREEN_WIDTH - scale) / 2;
+    zoom_rect.y = ((SCREEN_HEIGHT - scale) / 2) + 80;
+    zoom_rect.w = scale;
+    zoom_rect.h = scale;
+
+    if (zoom_rect.y + zoom_rect.h > SCREEN_HEIGHT)
+        bigger = 0;
+    SDL_RenderCopy (renderer, logo_tex, NULL, &zoom_rect);
+}
+
+double rotate_angle;
+void render_heads (void)
+{
 
     billybob_rect.x = 0;
     billybob_rect.y = 0;
@@ -183,7 +207,6 @@ void render_logo (void)
 
     if (++rotate_angle >= 360)
         rotate_angle = 0;
-    SDL_RenderCopyEx (renderer, logo_tex, NULL, &logo_rect, rotate_angle, NULL, 0);
     SDL_RenderCopyEx (renderer, billybob_tex, NULL, &billybob_rect, rotate_angle, NULL, 0);
     SDL_RenderCopyEx (renderer, bubba_tex, NULL, &bubba_rect, 360 - rotate_angle, NULL, 0);
     SDL_RenderCopyEx (renderer, grandpa_tex, NULL, &grandpa_rect, rotate_angle, NULL, 0);
@@ -269,6 +292,9 @@ void init_gfx_vars (void)
     x_up = 0;
     y_up = 0;
     rotate_angle = 0;
+
+    scale = 0;
+    bigger = 1;
 }
 
 void* gfx_thread (void *ptr)
@@ -313,8 +339,9 @@ void* gfx_thread (void *ptr)
         SDL_RenderClear(renderer);
         SDL_RenderCopy (renderer, background_tex, NULL, NULL);
         render_score ();
+        render_heads ();
         render_logo ();
-        render_sprite ();
+        //render_sprite ();
         SDL_RenderPresent (renderer);
         
         if (verbose)
@@ -324,6 +351,7 @@ void* gfx_thread (void *ptr)
             if (fpsFrames % 1000 == 0)
                 fprintf (stdout, "Average FPS = %f\n", fpsAvg);
         }
+        score++;
     }
     free_gfx ();
     pthread_exit (NULL);
