@@ -120,31 +120,8 @@ void *gpio_thread(void *ptr)
     return NULL;
 }
 
-int main(int argc, char *argv[])
-{
-    int ret;
-
-    fprintf (stdout, "=========\n");
-    fprintf (stdout, "|PiSound|\n");
-    fprintf (stdout, "=========\n\n");
-  
-    verbose = 0;
-    running = 0;
-    
-    //Check PID file
-    if (check_pid () != 0)
-    {
-        fprintf (stderr, "Error opening or creating PID file\n");
-        return 1;
-    }
-
-    if (getopts (argc, argv) != 0)
-        return 1;
-    
-    //setup signal handler
-    if (signal(SIGINT, sig_handler) == SIG_ERR)
-        fprintf(stderr, "\ncan't catch SIGINT\n");
- 
+int init_audio (void)
+{ 
     //Initialize SDL audio
 	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
 		printf("Unable to initialize SDL: %s\n", SDL_GetError());
@@ -156,15 +133,11 @@ int main(int argc, char *argv[])
 		printf("Unable to initialize audio: %s\n", Mix_GetError());
 		return 1;
 	}
-	
-    //Load configuration and sounds in memory
-    if (cfg_load () != 0)
-    {
-        fprintf (stderr, "An error occured reading the config file!\n");
-        fprintf (stderr, "%s\n", strerror(errno));
+
+    //Load sounds and music files
+    if (cfg_load_audio () != 0)
         return 1;
-    }
-    
+
     //Configure maximum amount of simultaenous voices
     Mix_AllocateChannels(max_voices);
     
@@ -174,6 +147,43 @@ int main(int argc, char *argv[])
     //Initialise volume
     init_volume ();
 
+    return 1;
+}
+
+int main(int argc, char *argv[])
+{
+    int ret;
+
+    fprintf (stdout, "=========\n");
+    fprintf (stdout, "|PiSound|\n");
+    fprintf (stdout, "=========\n\n");
+  
+    running = 0;
+    
+    //Check PID file
+    if (check_pid () != 0)
+    {
+        fprintf (stderr, "Error opening or creating PID file\n");
+        return 1;
+    }
+
+    //Read cmd line args
+    if (getopts (argc, argv) != 0)
+        return 1;
+    
+   //Load configuration and sounds in memory
+    if (cfg_load () != 0)
+    {
+        fprintf (stderr, "An error occured reading the config file!\n");
+        fprintf (stderr, "%s\n", strerror(errno));
+        return 1;
+    }
+    
+    //setup signal handler
+    if (signal(SIGINT, sig_handler) == SIG_ERR)
+        fprintf(stderr, "\ncan't catch SIGINT\n");
+
+    init_audio ();
     running = 1;
    
     //Start the GPIO thread

@@ -5,7 +5,7 @@ int load_fonts (void)
     int i, len, fontsize;
     FILE *cfg_file;
     char cfg_line[1024], *filename;
-    const char delim[1] = ",";
+    const char delim[] = ",";
 
     if (TTF_Init () != 0)
     {
@@ -54,5 +54,3 @@ int load_fonts (void)
     fclose (cfg_file);
     return 0;
 }
-
-
