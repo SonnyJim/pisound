@@ -65,6 +65,7 @@ int SCREEN_WIDTH;
 int SCREEN_BPP;
 
 int load_fonts (void);
+static int load_gfx_resources (void);
 
 //Some vars for score_render
 int player_num;

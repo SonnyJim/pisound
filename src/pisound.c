@@ -187,21 +187,30 @@ int main(int argc, char *argv[])
     running = 1;
    
     //Start the GPIO thread
-    ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
-    if (ret)
+    if (cfg_gpio_engine)
     {
-        fprintf(stderr,"Error creating gpio_thread: %i\n",ret);
+        ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
+        if (ret)
+        {
+            fprintf(stderr,"Error creating gpio_thread: %i\n",ret);
+            return 1;
+        }
+        else
+            fprintf (stdout, "GPIO thread started\n");
     }
-    else
-        fprintf (stdout, "GPIO thread started\n");
 
     //Start the udp server
-    ret = pthread_create (&thread2, NULL, udp_thread, NULL);
-    if (ret)
+    if (cfg_udp_engine)
     {
-        fprintf(stderr,"Error creating udp_thread: %i\n",ret);
+        ret = pthread_create (&thread2, NULL, udp_thread, NULL);
+        if (ret)
+        {
+            fprintf(stderr,"Error creating udp_thread: %i\n",ret);
+            return 1;
+        }
+        else
+            fprintf (stdout, "UDP thread started\n");
     }
-    else
  
     //Start the gfx thread
     if (cfg_gfx_engine)

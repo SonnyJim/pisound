@@ -217,7 +217,8 @@ void show_pisound_logo (void)
     SDL_RenderClear (renderer);    
     SDL_RenderCopy (renderer, logo_tex, NULL, NULL);
     SDL_RenderPresent (renderer);
-    SDL_Delay (3000);
+    load_gfx_resources ();
+    //SDL_Delay (3000);
 }
 
 int init_screen (void)
@@ -278,13 +279,13 @@ int init_screen (void)
     if (renderer == NULL)
     {
         fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
-        renderer = SDL_CreateRenderer(window, 2, SDL_RENDERER_SOFTWARE);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
         if (renderer == NULL)
             return 1;
     }
     
     SDL_GetRenderDriverInfo (i, &drinfo);
-    fprintf (stdout, "Using %s\n", drinfo.name);
+    fprintf (stdout, "Using %s driver\n", drinfo.name);
     return 0;
 }
 
@@ -304,6 +305,14 @@ void init_gfx_vars (void)
     bigger = 1;
 }
 
+static int load_gfx_resources (void)
+{
+    load_gfx ();
+    load_fonts ();
+    init_gfx_vars ();
+    return 0;
+}
+
 void* gfx_thread (void *ptr)
 {
 
@@ -317,13 +326,12 @@ void* gfx_thread (void *ptr)
         pthread_exit (NULL);
     }
 
+    //show logo also loads resources
     if (cfg_show_logo)
         show_pisound_logo ();
+    else
+        load_gfx_resources ();
 
-   //Load all the resources we want to use
-    load_gfx ();
-    load_fonts ();
-    init_gfx_vars ();
 
     background_srf = SDL_LoadBMP("images/background.bmp");
     if (background_srf == NULL)

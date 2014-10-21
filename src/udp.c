@@ -115,9 +115,6 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
 
 void* udp_thread (void *ptr)
 {
-   if (verbose)
-       fprintf (stdout, "Starting udp server\n");
-   
    if ((sockfd = socket(AF_INET,SOCK_DGRAM,0)) == -1)
    {
         fprintf (stderr, "Can't create socket: %s\n", strerror(errno));
