@@ -84,42 +84,6 @@ void play_sounds (void)
     }
 }
 
-//Read the GPIO
-void *gpio_thread(void *ptr)
-{
-        /*
-    int i;
-    while (1)
-    {
-        for (i = 0; i < 5; i++)
-        {
-            music_requested = i;
-            sleep (2);
-            sound_queue_add (i);
-            sleep (2);
-            sound_queue_add (i);
-            music_requested = MUSIC_OFF;
-            sleep (2);
-        }
-
-        //Decode sound_code from GPIO
-        switch (sound_code)
-        {
-            case SND_VOL_UP:
-                volume_up ();
-                break;
-            case SND_VOL_DOWN:
-                volume_down ();
-                break;
-            case SND_STOP_MUSIC:
-                music_requested = MUSIC_OFF;
-                break;
-        }
-    }
-        */
-    return NULL;
-}
-
 int init_audio (void)
 { 
     //Initialize SDL audio

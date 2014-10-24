@@ -91,3 +91,6 @@ int check_pid (void);
 int remove_pid (void);
 
 void free_gfx (void);
+
+//GPIO
+void *gpio_thread(void *ptr);
