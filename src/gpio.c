@@ -19,7 +19,7 @@
 #define STATUS_LED  13
 
 //Whether the input buffer has been read by the WPC CPU
-bool input_waiting, output_waiting;
+bool output_waiting;
 
 struct queue_t gpio_input_q;
 struct queue_t gpio_output_q;
@@ -30,9 +30,12 @@ static uint8_t read_gpio (void)
     uint8_t input = 0;
     int i;
 
+    digitalWrite (IC3_CE, IC3_ENABLE);
     for (i = 0; i < 8; i++)
         input |= (digitalRead (i) << i);
 
+    digitalWrite (IC3_CE, IC3_DISABLE);
+    
     return input;
 }
 
@@ -45,7 +48,7 @@ void irq_recv (void)
         fprintf (stdout, "Received %i on GPIO\n", val);
     queue_add (&gpio_input_q, val);
     //Assuming that the WPC CPU reads U29 before it tries to send data to U30
-    input_waiting = false;
+    output_waiting = false;
 }
 
 void rst_recv (void)
@@ -61,8 +64,6 @@ static void set_gpio_output (void)
         pinMode (i, OUTPUT);
     //Change the Pi buffer direction
     digitalWrite (IC6_DIR, IC6_OUT);
-    //Disable the WPC input buffer
-    digitalWrite (IC3_CE, IC3_DISABLE);
 }
 
 //Change the GPIO buffer to input
@@ -73,8 +74,6 @@ static void set_gpio_input (void)
         pinMode (i, INPUT);
     //Change the Pi buffer direction
     digitalWrite (IC6_DIR, IC6_IN);
-    //Enable the WPC input buffer
-    digitalWrite (IC3_CE, IC3_ENABLE);
 }
 
 //Generate a CLK pulse for IC4
@@ -114,12 +113,17 @@ static void write_gpio (uint8_t val)
 {
     //Set GPIO buffer to output
     set_gpio_output ();
+    
+    //Disable IC3 for a moment
+    digitalWrite (IC3_CE, IC3_DISABLE);
     //Write to output buffer
     digitalWriteByte (val);
-    input_waiting = true;
+    output_waiting = true;
     //Clock the data into IC4, ready for the WPC to pick it up
     out_clk ();
+
     //Set GPIO buffer back to input
+    digitalWrite (IC3_CE, IC3_ENABLE);
     set_gpio_input ();
 }
 
@@ -134,11 +138,13 @@ void *gpio_thread(void *ptr)
     init_gpio ();
     while (running)
     {
-        if (!queue_empty (&gpio_output_q) && !input_waiting)
-            write_gpio (queue_remove (&gpio_output_q));
-
+        //Read from the sound queue and send to the Pi
         if (!queue_empty (&gpio_input_q))
             sound_queue_add (queue_remove (&gpio_input_q));
+
+        //Write to the sound queue and send out to the WPC CPU
+        if (!queue_empty (&gpio_output_q) && !output_waiting)
+            write_gpio (queue_remove (&gpio_output_q));
     }
     digitalWrite (STATUS_LED, 0);
     return NULL;
