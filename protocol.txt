@@ -1,0 +1,18 @@
+Notes:
+======
+On boot main CPU tries to read 0x3FDD 100 times, then reads 0x3FDC, 
+It then reads 0x3FDD a couple more times
+then sends a version control cmd to the sound board 
+reads 0x3FDD another 8 or so times
+sends another version control cmd
+reads 0x3FDD another 8 or so times
+Reads 0x3FDC
+Once the sound board writes 02 to 0x3FDC, the main CPU stops reading 0x3FDD
+
+Main CPU sends 0x00 (? init ?)
+Main CPU sends 0x79 (volume set)
+Main CPU sends 0x0C (???)
+Main CPU sends 0xF3 (????)
+
+
+
