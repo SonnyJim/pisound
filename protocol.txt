@@ -1,5 +1,8 @@
-Notes:
-======
+Protocol notes:
+===============
+0x3FDD - Sound board writes 0x01 when it has data to transmit to the main CPU
+0x3FDC - Location for sound commands/data to be passed back and forth
+
 On boot main CPU tries to read 0x3FDD 100 times, then reads 0x3FDC, 
 It then reads 0x3FDD a couple more times
 then sends a version control cmd to the sound board 
@@ -11,8 +14,17 @@ Once the sound board writes 02 to 0x3FDC, the main CPU stops reading 0x3FDD
 
 Main CPU sends 0x00 (? init ?)
 Main CPU sends 0x79 (volume set)
-Main CPU sends 0x0C (???)
-Main CPU sends 0xF3 (????)
+Main CPU sends 0x0C (volume level 12)
+Main CPU sends 0xF3 (Checksum, just a bitflip of the volume)
 
 
+Sound codes @ 3fdc for TZ_94H
+===========
+73      = Break things with a long sustain?
+2f + x  = Play song x quantised to bar
 
+ca/cb are unused tunes
+
+Set 3fdd to any non-zero value and the sound board resets
+
+ww_l5 uses 7B to fetch the sound board version, the quantised music starts at 31
