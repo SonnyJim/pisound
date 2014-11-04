@@ -99,7 +99,7 @@ static int cfg_load_music (void)
         }
     }
     fclose (sound_list);
-    return 1;
+    return 0;
 }
 
 int cfg_load (void)
@@ -212,9 +212,17 @@ int cfg_load (void)
 
 int cfg_load_audio (void)
 {
+    loading_resources = 1;
     if (cfg_load_sounds () != 0)
+    {
+        fprintf (stderr, "Error loading sfx\n");
         return 1;
+    }
     if (cfg_load_music () != 0)
+    {
+        fprintf (stderr, "Error loading music\n");
         return 1;
+    }
+    loading_resources = 0;
     return 0;
 }
