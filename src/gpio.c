@@ -1,7 +1,7 @@
 #include <wiringPi.h>
 #include "pisound.h"
 #include "gpio.h"
-#include "gpio_queue.h"
+#include "queue.h"
 
 //IC6 = Output buffer to WPC
 #define IC6_DIR     8
@@ -21,10 +21,6 @@
 //Whether the input buffer has been read by the WPC CPU
 bool output_waiting;
 
-struct queue_t gpio_input_q;
-struct queue_t gpio_output_q;
-
-//Read an 8bit value from GPIO 0-7
 static uint8_t read_gpio (void)
 {
     uint8_t input = 0;
@@ -138,9 +134,9 @@ void *gpio_thread(void *ptr)
     init_gpio ();
     while (running)
     {
-        //Read from the sound queue and send to the Pi
+        //Read from the GPIO queue and send to the sound queue
         if (!queue_empty (&gpio_input_q))
-            sound_queue_add (queue_remove (&gpio_input_q));
+            queue_add (&sfx_q, (queue_remove (&gpio_input_q)));
 
         //Write to the sound queue and send out to the WPC CPU
         if (!queue_empty (&gpio_output_q) && !output_waiting)

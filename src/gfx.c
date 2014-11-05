@@ -210,15 +210,41 @@ void render_heads (void)
 
 void show_pisound_logo (void)
 {
-
-    logo_tex = load_image_to_texture ("images/pisound_logo.png");
-    SDL_QueryTexture (logo_tex, NULL, NULL, &logo_rect.w, &logo_rect.h);
-    
-    SDL_RenderClear (renderer);    
-    SDL_RenderCopy (renderer, logo_tex, NULL, NULL);
-    SDL_RenderPresent (renderer);
+    int textWidth, textHeight, xpos, ypos, i=0;
+    char loading_text[4][12] = { "Loading", "Loading.", "Loading..", "Loading..." };
     load_gfx_resources ();
-    //SDL_Delay (3000);
+
+    loading_tex = load_image_to_texture ("images/pisound_logo.png");
+    SDL_QueryTexture (loading_tex, NULL, NULL, &loading_rect.w, &loading_rect.h);
+    
+    while (loading_resources != 0)
+    {
+        TTF_SizeText (fonts[0], loading_text[i], &textWidth, &textHeight);
+        xpos = (SCREEN_WIDTH - textWidth) / 2;
+        ypos = SCREEN_HEIGHT - textHeight - 70;
+        loading_txt_rect.x = xpos;
+        loading_txt_rect.y = ypos;
+        loading_txt_rect.w = textWidth;
+        loading_txt_rect.h = textHeight;
+ 
+        textColor = (SDL_Color) { 0, 0, 255};
+        loading_txt_srf = TTF_RenderText_Solid( fonts[0], loading_text[i], textColor );
+        loading_txt_tex = SDL_CreateTextureFromSurface(renderer, loading_txt_srf);
+        SDL_FreeSurface (loading_srf);
+        loading_srf = NULL;
+
+        SDL_RenderClear (renderer);    
+        SDL_RenderCopy (renderer, loading_tex, NULL, NULL);
+        SDL_RenderCopy (renderer, loading_txt_tex, NULL, &loading_txt_rect);
+        SDL_RenderPresent (renderer);
+        SDL_Delay (500);
+
+        if (i < 3)
+            i++;
+        else
+            i = 0;
+
+    }
 }
 
 int init_screen (void)
@@ -305,7 +331,7 @@ void init_gfx_vars (void)
     bigger = 1;
 }
 
-static int load_gfx_resources (void)
+int load_gfx_resources (void)
 {
     load_gfx ();
     load_fonts ();
@@ -332,6 +358,7 @@ void* gfx_thread (void *ptr)
     else
         load_gfx_resources ();
 
+    fprintf (stdout, "Finish loading resources\n");
 
     background_srf = SDL_LoadBMP("images/background.bmp");
     if (background_srf == NULL)

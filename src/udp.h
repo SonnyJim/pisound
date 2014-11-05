@@ -1,3 +1,7 @@
+#include "pisound.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 /*
  * UDP message format:
  * 1 byte command followed by 1 byte code

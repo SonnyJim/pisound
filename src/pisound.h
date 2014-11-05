@@ -44,34 +44,20 @@ int audio_buffers;
 //Currently playing music
 int music_current;
 
-//Music requested
-int music_requested;
 int max_voices;
 
 int running;
 int verbose;
 int volume;
 
+//Used to signal when we are still loading music/sfx resources
+int loading_resources;
 
-//sound queue
-struct sound_queue_t {
-    int data[SOUND_QUEUE_SIZE + 1];
-    int first;
-    int last;
-    int count;
-} sound_queue;
-struct sound_queue_t sound_queue;
-    
 //GPIO thread
 pthread_t thread1, thread2, thread3;
 void* udp_thread (void *ptr);
 void* gpio_thread (void *ptr);
 void* gfx_thread (void *ptr);
-
-int sound_queue_read (void);
-void sound_queue_init (void);
-void sound_queue_add (int sound_code);
-void music_request (int music_code);
 
 void volume_up (void);
 void volume_down (void);
@@ -94,3 +80,5 @@ void free_gfx (void);
 
 //GPIO
 void *gpio_thread(void *ptr);
+
+

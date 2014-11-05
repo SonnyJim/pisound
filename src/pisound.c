@@ -1,4 +1,5 @@
 #include "pisound.h"
+#include "queue.h"
 
 void sig_handler (int signo)
 {
@@ -42,13 +43,14 @@ void free_sounds (void)
     music_requested = MUSIC_OFF;
     music_current = MUSIC_OFF;
 }
+
 //Check the sound_queue and play sounds if needed
 void sound_check (void)
 {
     int sound_code;
-    if (sound_queue.count > 0)
+    if (!queue_empty (&sfx_q))
     {
-        sound_code = sound_queue_read ();
+        sound_code = queue_remove (&sfx_q);
         if (verbose)
             fprintf (stderr, "Playing sound_code %i\n", sound_code);
         channel = Mix_PlayChannel(-1, sounds[sound_code], 0);
@@ -98,15 +100,11 @@ int init_audio (void)
 		return 1;
 	}
 
-    //Load sounds and music files
-    if (cfg_load_audio () != 0)
-        return 1;
-
     //Configure maximum amount of simultaenous voices
     Mix_AllocateChannels(max_voices);
     
     //Initialise the sound_queue
-    sound_queue_init ();
+    queue_init (&sfx_q);
     
     //Initialise volume
     init_volume ();
@@ -123,6 +121,7 @@ int main(int argc, char *argv[])
     fprintf (stdout, "=========\n\n");
   
     running = 0;
+    loading_resources = 1;
     
     //Check PID file
     if (check_pid () != 0)
@@ -134,8 +133,8 @@ int main(int argc, char *argv[])
     //Read cmd line args
     if (getopts (argc, argv) != 0)
         return 1;
-    
-   //Load configuration and sounds in memory
+   
+   //Load configuration
     if (cfg_load () != 0)
     {
         fprintf (stderr, "An error occured reading the config file!\n");
@@ -147,9 +146,20 @@ int main(int argc, char *argv[])
     if (signal(SIGINT, sig_handler) == SIG_ERR)
         fprintf(stderr, "\ncan't catch SIGINT\n");
 
-    init_audio ();
     running = 1;
-   
+    
+    //Start the gfx thread
+    if (cfg_gfx_engine)
+    {
+        ret = pthread_create (&thread3, NULL, gfx_thread, NULL);
+        if (ret)
+        {
+            fprintf(stderr,"Error creating gfx_thread: %i\n",ret);
+        }
+        else
+            fprintf (stdout, "GFX thread started\n");
+    }
+
     //Start the GPIO thread
     if (cfg_gpio_engine)
     {
@@ -176,17 +186,10 @@ int main(int argc, char *argv[])
             fprintf (stdout, "UDP thread started\n");
     }
  
-    //Start the gfx thread
-    if (cfg_gfx_engine)
-    {
-        ret = pthread_create (&thread3, NULL, gfx_thread, NULL);
-        if (ret)
-        {
-            fprintf(stderr,"Error creating gfx_thread: %i\n",ret);
-        }
-        else
-            fprintf (stdout, "GFX thread started\n");
-    }
+    init_audio ();
+    //Load sounds and music files
+    if (cfg_load_audio () != 0)
+        return 1;
 
     //Start main audio thread
     play_sounds ();

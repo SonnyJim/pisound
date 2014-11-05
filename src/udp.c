@@ -1,9 +1,6 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
-
 #include "pisound.h"
 #include "udp.h"
-
+#include "queue.h"
 #include "gfx.h"
 
 static void udp_send_pong (struct sockaddr_in cliaddr)
@@ -77,7 +74,7 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
     switch (byte1)
     {
         case UDP_SOUND_PLAY:
-            sound_queue_add (byte2);
+            queue_add (&sfx_q, byte2);
             break;
         case UDP_MUSIC_PLAY:
             music_request (byte2);

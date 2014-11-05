@@ -25,6 +25,13 @@ SDL_Rect    player_rect;
 SDL_Texture *logo_tex;
 SDL_Rect    logo_rect;
 
+SDL_Texture *loading_tex;
+SDL_Rect    loading_rect;
+SDL_Surface *loading_srf;
+
+SDL_Texture *loading_txt_tex;
+SDL_Rect    loading_txt_rect;
+SDL_Surface *loading_txt_srf;
 
 #define IMG_BILLYBOB    "images/headshots/billybob.png"
 #define IMG_BUBBA       "images/headshots/bubba.png"
@@ -65,7 +72,7 @@ int SCREEN_WIDTH;
 int SCREEN_BPP;
 
 int load_fonts (void);
-static int load_gfx_resources (void);
+int load_gfx_resources (void);
 
 //Some vars for score_render
 int player_num;
