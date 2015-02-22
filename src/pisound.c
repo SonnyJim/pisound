@@ -109,7 +109,7 @@ int init_audio (void)
     //Initialise volume
     init_volume ();
 
-    return 1;
+    return 0;
 }
 
 int main(int argc, char *argv[])
@@ -186,10 +186,18 @@ int main(int argc, char *argv[])
             fprintf (stdout, "UDP thread started\n");
     }
  
-    init_audio ();
+    if (init_audio () != 0)
+    {
+        fprintf (stderr, "Error initialising audio\n");
+        return 1;
+    }
+
     //Load sounds and music files
     if (cfg_load_audio () != 0)
+    {
+        fprintf (stderr, "Error loading sound files\n");
         return 1;
+    }
 
     //Start main audio thread
     play_sounds ();
