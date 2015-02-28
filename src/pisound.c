@@ -10,7 +10,9 @@ void sig_handler (int signo)
 	    Mix_CloseAudio();
         remove_pid ();
         running = 0;
+#ifdef BUILD_GFX
         free_gfx ();
+#endif
 	    SDL_Quit();	
     }
 }
@@ -50,7 +52,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "\ncan't catch SIGINT\n");
 
     running = 1;
-    
+
+#ifdef BUILD_GFX    
     //Start the gfx thread
     if (cfg_gfx_engine)
     {
@@ -62,6 +65,7 @@ int main(int argc, char *argv[])
         else
             fprintf (stdout, "GFX thread started\n");
     }
+#endif
 
 #ifdef BUILD_GPIO
     //Start the GPIO thread

@@ -4,7 +4,9 @@ void show_args (void)
 {
     fprintf (stdout, "Command line options:\n");
     fprintf (stdout, "      -v          Verbose output\n");
+#ifdef BUILD_GFX
     fprintf (stdout, "      -g          Enable GFX \n");
+#endif
     fprintf (stdout, "      -a          Enable audio \n");
 #ifdef BUILD_GPIO
     fprintf (stdout, "      -G          Enable GPIO\n");
@@ -34,9 +36,11 @@ int getopts (int argc, char *argv[])
         case 'v':
             verbose = 1;
             break;
+#ifdef BUILD_GFX
         case 'g':
             cfg_gfx_engine = 1;
             break;
+#endif
         case 'a':
             cfg_audio_engine = 1;
             break;
