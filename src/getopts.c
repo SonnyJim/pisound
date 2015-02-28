@@ -6,7 +6,9 @@ void show_args (void)
     fprintf (stdout, "      -v          Verbose output\n");
     fprintf (stdout, "      -g          Enable GFX \n");
     fprintf (stdout, "      -a          Enable audio \n");
+#ifdef BUILD_GPIO
     fprintf (stdout, "      -G          Enable GPIO\n");
+#endif
     fprintf (stdout, "      -u          Enable UDP server\n");
     fprintf (stdout, "      -f          Show average frames per second\n");
     fprintf (stdout, "      -l          Don't show Pisound logo on startup\n");
@@ -38,9 +40,11 @@ int getopts (int argc, char *argv[])
         case 'a':
             cfg_audio_engine = 1;
             break;
+#ifdef BUILD_GPIO
         case 'G':
             cfg_gpio_engine = 1;
             break;
+#endif
         case 'u':
             cfg_udp_engine = 1;
             break;

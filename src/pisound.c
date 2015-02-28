@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
             fprintf (stdout, "GFX thread started\n");
     }
 
+#ifdef BUILD_GPIO
     //Start the GPIO thread
     if (cfg_gpio_engine)
     {
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
         else
             fprintf (stdout, "GPIO thread started\n");
     }
+#endif
 
     //Start the udp server
     if (cfg_udp_engine)

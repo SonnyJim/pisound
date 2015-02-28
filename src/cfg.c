@@ -183,14 +183,14 @@ int cfg_load (void)
                 if (verbose)
                     fprintf (stdout, "%s%i\n", CFG_AUDIO_ENGINE, cfg_audio_engine);
             }
-            
+#ifdef BUILD_GPIO 
             if (strncmp (cfg_line, CFG_GPIO_ENGINE, strlen(CFG_GPIO_ENGINE)) == 0)
             {
                 cfg_gpio_engine = atoi(cfg_line + strlen (CFG_GPIO_ENGINE));
                 if (verbose)
                     fprintf (stdout, "%s%i\n", CFG_GPIO_ENGINE, cfg_gpio_engine);
             }
-            
+#endif
             if (strncmp (cfg_line, CFG_UDP_ENGINE, strlen(CFG_UDP_ENGINE)) == 0)
             {
                 cfg_udp_engine = atoi(cfg_line + strlen (CFG_UDP_ENGINE));
