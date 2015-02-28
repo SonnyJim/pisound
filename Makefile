@@ -10,7 +10,7 @@ GPIO_LIBS = -lwiringPi
 LDLIBS += $(GPIO_LIBS)
 GPIO_OBJS = src/gpio.o
 OBJS += $(GPIO_OBJS)
-OBJS = src/pisound.o src/getopts.o src/queue.o src/cfg.o src/udp.o src/volume.o src/pidfile.o src/gfx.o src/gfx_font.o src/gpio.o
+OBJS = src/pisound.o src/getopts.o src/queue.o src/cfg.o src/udp.o src/volume.o src/pidfile.o src/snd.o src/gfx.o src/gfx_font.o src/gpio.o 
 
 all: pisound
 

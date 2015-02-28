@@ -53,7 +53,6 @@ int volume;
 //Used to signal when we are still loading music/sfx resources
 int loading_resources;
 
-//GPIO thread
 pthread_t thread1, thread2, thread3;
 void* udp_thread (void *ptr);
 void* gpio_thread (void *ptr);
@@ -65,6 +64,10 @@ void volume_set (int volume);
 
 int cfg_load (void);
 
+// snd.c
+int init_audio (void);
+void play_sounds (void);
+
 void init_sounds (void);
 void free_sounds (void);
 
@@ -73,12 +76,10 @@ void volume_set (int volume);
 void volume_up (void);
 void volume_down (void);
 
+// pid.c
 int check_pid (void);
 int remove_pid (void);
 
+// gfx.c
 void free_gfx (void);
-
-//GPIO
-void *gpio_thread(void *ptr);
-
 
