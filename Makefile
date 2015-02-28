@@ -16,7 +16,7 @@ endif
 
 ifdef BUILD_GFX
 CFLAGS += -DBUILD_GFX
-LDLIBS += lSDL2_ttf -lSDL2_image 
+LDLIBS += -lSDL2_ttf -lSDL2_image 
 OBJS += src/gfx.o src/gfx_font.o
 endif
 
