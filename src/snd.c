@@ -62,14 +62,15 @@ static void music_check (void)
 }
 
 //Main sound loop
-void play_sounds (void)
+void* snd_thread (void *ptr)
 {
-    fprintf (stdout, "Audio thread started\n");
     while (running)
     {
         music_check ();
         sound_check ();
     }
+    fprintf (stdout, "Audio thread stopped\n");
+    return NULL;
 }
 
 int init_audio (void)

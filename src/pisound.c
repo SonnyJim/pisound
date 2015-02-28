@@ -4,16 +4,45 @@
 void sig_handler (int signo)
 {
     if (signo == SIGINT)
-    { 
+    {
         fprintf (stdout, "\nSIGINT detected, shutting down\n");
+        running = 0;
+        //Wait for threads to die
+        if (cfg_gpio_engine)
+        {
+            if (verbose)
+                fprintf (stdout, "Waiting for GPIO to shutdown\n");
+            while (pthread_kill (thread1, 0) == 0){}
+        }
+        
+        /* FIXME UDP never exits?
+        if (cfg_udp_engine)
+        {
+            if (verbose)
+                fprintf (stdout, "Waiting for UDP server to shutdown\n");
+            while (pthread_kill (thread2, 0) == 0) {
+            printf ("WAITING\n");
+            sleep (1);
+            }
+
+        }
+        */
+        if (cfg_gfx_engine)
+        {
+            if (verbose)
+                fprintf (stdout, "Waiting for GFX to shutdown\n");
+            while (pthread_kill (thread3, 0) == 0){}
+        }
+
+        if (verbose)
+            fprintf (stdout, "Waiting for sound to shutdown\n");
+        while (pthread_kill (thread4, 0) == 0){}
+        
         free_sounds ();
 	    Mix_CloseAudio();
-        remove_pid ();
-        running = 0;
-#ifdef BUILD_GFX
-        free_gfx ();
-#endif
 	    SDL_Quit();	
+        remove_pid ();
+        shutdown = 1;
     }
 }
 
@@ -26,6 +55,7 @@ int main(int argc, char *argv[])
     fprintf (stdout, "=========\n\n");
   
     running = 0;
+    shutdown = 0;
     loading_resources = 1;
     
     //Check PID file
@@ -60,7 +90,8 @@ int main(int argc, char *argv[])
         ret = pthread_create (&thread3, NULL, gfx_thread, NULL);
         if (ret)
         {
-            fprintf(stderr,"Error creating gfx_thread: %i\n",ret);
+            fprintf(stderr,"Error creating gfx_thread: %i\n", ret);
+            return 1;
         }
         else
             fprintf (stdout, "GFX thread started\n");
@@ -74,7 +105,7 @@ int main(int argc, char *argv[])
         ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
         if (ret)
         {
-            fprintf(stderr,"Error creating gpio_thread: %i\n",ret);
+            fprintf(stderr,"Error creating gpio_thread: %i\n", ret);
             return 1;
         }
         else
@@ -109,8 +140,27 @@ int main(int argc, char *argv[])
     }
 
     //Start main audio thread
-    play_sounds ();
+    ret = pthread_create (&thread4, NULL, snd_thread, NULL);
+    if (ret)
+    {
+        fprintf(stderr,"Error creating sound thread: %i\n",ret);
+        return 1;
+    }
+    else
+        fprintf (stdout, "Sound thread started\n");
    
+
+    while (running) 
+    {
+        sleep (1);
+    }
+
+    while (shutdown == 0)
+    {
+        fprintf (stdout, "Waiting for threads to shutdown\n");
+        sleep (1);
+    }
+
     fprintf (stdout, "\nExiting\n");
 	return 0;
 }

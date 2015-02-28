@@ -140,9 +140,9 @@ void* udp_thread (void *ptr)
            udp_decode_msg (mesg, cliaddr);
            memset (mesg, 0, sizeof(mesg));
        }
+       if (verbose)
+           fprintf (stdout, "Shutting down udp server\n");
    }
-   if (verbose)
-       fprintf (stdout, "Shutting down udp server\n");
    
    return NULL;
 }

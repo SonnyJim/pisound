@@ -143,6 +143,8 @@ void *gpio_thread(void *ptr)
             write_gpio (queue_remove (&gpio_output_q));
     }
     digitalWrite (STATUS_LED, 0);
+    if (verbose)
+        fprintf (stdout, "GPIO thread stopped\n");
     return NULL;
 }
 

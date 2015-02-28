@@ -1,23 +1,6 @@
 #include "pisound.h"
 #include "gfx.h"
 
-//#include "bcm_host.h"
-
-void free_gfx (void) 
-{ 
-    int i;
-
-    if(renderer) 
-        SDL_DestroyRenderer (renderer);
-    if(window) 
-        SDL_DestroyWindow (window);
-    
-    //Close the fonts that were used 
-    for (i = 0; i < MAX_FONTS; i++)
-        TTF_CloseFont(fonts[i]);
-    TTF_Quit();
-}
-
 //Puts thousand separators into string
 char *render_score_to_string (long long score)
 {
@@ -211,12 +194,21 @@ void render_heads (void)
 void show_pisound_logo (void)
 {
     int textWidth, textHeight, xpos, ypos, i=0;
-    char loading_text[4][12] = { "Loading", "Loading.", "Loading..", "Loading..." };
+    char loading_text[4][12] = { "Loading |", "Loading /", "Loading -", "Loading \\" };
     load_gfx_resources ();
 
+    SDL_Texture *frog_tex = load_image_to_texture ("images/frog.png");
+    SDL_Rect    frog_srcrect;
+    SDL_Rect    frog_dstrect;
     loading_tex = load_image_to_texture ("images/pisound_logo.png");
+
     SDL_QueryTexture (loading_tex, NULL, NULL, &loading_rect.w, &loading_rect.h);
     
+    frog_dstrect.x = SCREEN_WIDTH / 2;
+    frog_dstrect.y = SCREEN_HEIGHT / 2;
+    frog_dstrect.w = 64;
+    frog_dstrect.h = 64;
+
     while (loading_resources != 0)
     {
         TTF_SizeText (fonts[0], loading_text[i], &textWidth, &textHeight);
@@ -233,9 +225,15 @@ void show_pisound_logo (void)
         SDL_FreeSurface (loading_srf);
         loading_srf = NULL;
 
+        frog_srcrect.x = 0 + (i * 64);
+        frog_srcrect.y = 0;
+        frog_srcrect.w = 64;
+        frog_srcrect.h = 64;
+
         SDL_RenderClear (renderer);    
         SDL_RenderCopy (renderer, loading_tex, NULL, NULL);
         SDL_RenderCopy (renderer, loading_txt_tex, NULL, &loading_txt_rect);
+        SDL_RenderCopy (renderer, frog_tex, &frog_srcrect, &frog_dstrect);
         SDL_RenderPresent (renderer);
         SDL_Delay (500);
 
@@ -288,7 +286,7 @@ int init_screen (void)
             fprintf (stdout, "Driver %i: %s\n", i, drinfo.name);
         }
     }
-
+    
     //Try all the different SDL2 drivers until we find one that works ;-)
     for (i = 0; i < numdrivers; i++)
     {
@@ -301,13 +299,16 @@ int init_screen (void)
         else
             break;
     }
-
+    
     if (renderer == NULL)
     {
         fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
         if (renderer == NULL)
+        {
+            fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
             return 1;
+        }
     }
     
     SDL_GetRenderDriverInfo (i, &drinfo);
@@ -341,6 +342,7 @@ int load_gfx_resources (void)
 
 void* gfx_thread (void *ptr)
 {
+    int font_num;
 
 
     //Set locale for thousand separator in render_score
@@ -349,7 +351,8 @@ void* gfx_thread (void *ptr)
     if (init_screen () != 0)
     {
         fprintf (stderr, "Error setting up screen\n");
-        pthread_exit (NULL);
+        return (void *) 1;
+        //pthread_exit (NULL);
     }
 
     //show logo also loads resources
@@ -358,7 +361,7 @@ void* gfx_thread (void *ptr)
     else
         load_gfx_resources ();
 
-    fprintf (stdout, "Finish loading resources\n");
+    fprintf (stdout, "Finished loading resources\n");
 
     background_srf = SDL_LoadBMP("images/background.bmp");
     if (background_srf == NULL)
@@ -400,5 +403,16 @@ void* gfx_thread (void *ptr)
                 fprintf (stdout, "Average FPS = %f\n", fpsAvg);
         }
     }
+   
+    //Close the fonts that were used 
+    for (font_num = 0; font_num < MAX_FONTS; font_num++)
+        TTF_CloseFont(fonts[font_num]);
+    TTF_Quit();
+
+    SDL_QuitSubSystem (SDL_INIT_VIDEO);
+    
+    if (verbose)
+       fprintf (stdout, "GFX thread stopped\n");
+
     return NULL;
 }
