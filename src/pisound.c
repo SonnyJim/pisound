@@ -1,6 +1,14 @@
 #include "pisound.h"
 #include "queue.h"
 
+static void shutdown_pisound (void)
+{
+        free_sounds ();
+	    Mix_CloseAudio();
+	    SDL_Quit();	
+        remove_pid ();
+}
+
 void sig_handler (int signo)
 {
     if (signo == SIGINT)
@@ -37,12 +45,7 @@ void sig_handler (int signo)
         if (verbose)
             fprintf (stdout, "Waiting for sound to shutdown\n");
         while (pthread_kill (thread4, 0) == 0){}
-        
-        free_sounds ();
-	    Mix_CloseAudio();
-	    SDL_Quit();	
-        remove_pid ();
-        shutdown = 1;
+        shutdown_status = 1;
     }
 }
 
@@ -55,7 +58,7 @@ int main(int argc, char *argv[])
     fprintf (stdout, "=========\n\n");
   
     running = 0;
-    shutdown = 0;
+    shutdown_status = 0;
     loading_resources = 1;
     
     //Check PID file
@@ -155,11 +158,18 @@ int main(int argc, char *argv[])
         sleep (1);
     }
 
-    while (shutdown == 0)
+    int counter = 0;
+    while (shutdown_status == 0)
     {
-        fprintf (stdout, "Waiting for threads to shutdown\n");
+        raise (SIGINT);
+        fprintf (stdout, "Waiting for threads to shutdown %i\n", counter);
         sleep (1);
+        //If threads havent responded by 3 seconds, shutdown now
+        if (++counter > 3)
+            shutdown_status = 1;
     }
+
+    shutdown_pisound ();
 
     fprintf (stdout, "\nExiting\n");
 	return 0;
