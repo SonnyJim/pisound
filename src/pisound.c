@@ -12,6 +12,7 @@ static void shutdown_pisound (void)
 
 void sig_handler (int signo)
 {
+    int shutdown_counter = 0;
     if (signo == SIGINT)
     {
         fprintf (stdout, "\nSIGINT detected, shutting down\n");
@@ -19,9 +20,20 @@ void sig_handler (int signo)
         //Wait for threads to die
         if (cfg_gpio_engine)
         {
+            shutdown_counter = 0;
             if (verbose)
                 fprintf (stdout, "Waiting for GPIO to shutdown\n");
-            while (pthread_kill (thread1, 0) == 0){}
+
+            while (pthread_kill (thread1, 0) == 0)
+            {
+                sleep(1);
+                if (shutdown_counter++ > 5)
+                {
+                    if (verbose)
+                        fprintf (stdout, "Failed to shutdown GPIO thread\n");
+                    break;
+                }
+            }
         }
         
         /* FIXME UDP never exits?
@@ -38,19 +50,41 @@ void sig_handler (int signo)
         */
         if (cfg_gfx_engine)
         {
+            shutdown_counter = 0;
             if (verbose)
                 fprintf (stdout, "Waiting for GFX to shutdown\n");
-            while (pthread_kill (thread3, 0) == 0){}
+            while (pthread_kill (thread3, 0) == 0)
+            {
+                sleep(1);
+                if (shutdown_counter++ > 5)
+                {
+                    if (verbose)
+                        fprintf (stdout, "Failed to shutdown GFX thread\n");
+                    break;
+                }
+            }
         }
-
+        
+        shutdown_counter = 0;
         if (verbose)
             fprintf (stdout, "Waiting for sound to shutdown\n");
-        while (pthread_kill (thread4, 0) == 0){}
+        
+        while (pthread_kill (thread4, 0) == 0)
+        {
+            sleep(1);
+            if (shutdown_counter++ > 5)
+            {
+                if (verbose)
+                    fprintf (stdout, "Failed to shutdown sound thread\n");
+                break;
+            }
+        }
+        
         shutdown_status = 1;
     }
 }
 
-int main(int argc, char *argv[])
+int main (int argc, char *argv[])
 {
     int ret;
 
@@ -62,6 +96,7 @@ int main(int argc, char *argv[])
     shutdown_status = 0;
     loading_resources = 1;
     current_scene = BOOT;
+    running_scene = INVALID_SCENE;
     
     //Check PID file
     if (check_pid () != 0)
