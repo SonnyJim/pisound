@@ -47,16 +47,22 @@ int music_current;
 int max_voices;
 
 int running;
+int shutdown_status;
 int verbose;
 int volume;
 
 //Used to signal when we are still loading music/sfx resources
 int loading_resources;
 
-pthread_t thread1, thread2, thread3;
+pthread_t thread1; // GPIO
+pthread_t thread2; // UDP
+pthread_t thread3; // GFX
+pthread_t thread4; // Audio
+
 void* udp_thread (void *ptr);
 void* gpio_thread (void *ptr);
 void* gfx_thread (void *ptr);
+void* snd_thread (void *ptr);
 
 void volume_up (void);
 void volume_down (void);
@@ -80,6 +86,5 @@ void volume_down (void);
 int check_pid (void);
 int remove_pid (void);
 
-// gfx.c
-void free_gfx (void);
-
+//video
+int play_video (void);
