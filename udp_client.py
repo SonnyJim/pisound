@@ -69,6 +69,7 @@ def send_thread ():
         elif readkey == "t":
             message = raw_input ("Enter in custom message: ")
         elif readkey == "Q":
+            print "Shutting down pisound server"
             message = "fc"
         elif readkey == "q":
             running = 0

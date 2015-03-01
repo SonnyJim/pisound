@@ -12,9 +12,6 @@
 
 #include "cfg.h"
 
-#define SOUND_QUEUE_SIZE 16
-#define QUEUE_POS_EMPTY 256
-
 #define MAX_SOUNDS 255
 #define MAX_MUSIC 255
 
@@ -47,13 +44,16 @@ int music_current;
 int max_voices;
 
 int running;
-int shutdown_status;
 int verbose;
 int volume;
 
 //Used to signal when we are still loading music/sfx resources
 int loading_resources;
 
+//Used to signal shutdown status
+int shutdown_status;
+
+//Threads
 pthread_t thread1; // GPIO
 pthread_t thread2; // UDP
 pthread_t thread3; // GFX
@@ -76,11 +76,6 @@ void play_sounds (void);
 
 void init_sounds (void);
 void free_sounds (void);
-
-void init_volume (void);
-void volume_set (int volume);
-void volume_up (void);
-void volume_down (void);
 
 // pid.c
 int check_pid (void);

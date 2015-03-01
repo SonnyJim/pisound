@@ -2,6 +2,7 @@
 #include "udp.h"
 #include "queue.h"
 #include "gfx.h"
+#include "scene.h"
 
 static void udp_send_pong (struct sockaddr_in cliaddr)
 {
@@ -24,6 +25,21 @@ static void udp_score_receive (char *msg)
     fprintf (stdout, "Score set to %lld\n", score);
 }
 
+static void udp_scene_receive (int num)
+{
+    if (num >= 0 && num <= MAX_SCENES)
+    {
+        if (verbose)
+            fprintf (stdout, "scene change requested: %s\n", scene_names[num]);
+        current_scene = num;
+    }
+    else
+    {
+        fprintf (stderr, "Error: requested scene %i out of range\n", num);
+        udp_send_cmd_error (cliaddr);
+    }
+}
+
 static void udp_player_num (int num)
 {
     if (num > 0 && num <= MAX_PLAYERS)
@@ -31,7 +47,10 @@ static void udp_player_num (int num)
         player_num = num;
     }
     else
+    {
         fprintf (stderr, "Error: udp_player_num out of range\n");
+        udp_send_cmd_error (cliaddr);
+    }
 }
 
 static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
@@ -54,7 +73,7 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
         return;
     }
     else if (strlen (msg) < 4 
-            && (byte1 == UDP_SOUND_PLAY || byte1 == UDP_MUSIC_PLAY))
+            && (byte1 == UDP_SOUND_PLAY || byte1 == UDP_MUSIC_PLAY || byte1 == UDP_SCENE_CHANGE))
     {
         fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
         fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
@@ -105,6 +124,9 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
             break;
         case UDP_QUIT:
             running = 0;
+            break;
+        case UDP_SCENE_CHANGE:
+            udp_scene_receive (byte2);
             break;
         default:
             fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);

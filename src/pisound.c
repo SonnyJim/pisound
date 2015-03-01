@@ -1,5 +1,6 @@
 #include "pisound.h"
 #include "queue.h"
+#include "scene.h"
 
 static void shutdown_pisound (void)
 {
@@ -60,6 +61,7 @@ int main(int argc, char *argv[])
     running = 0;
     shutdown_status = 0;
     loading_resources = 1;
+    current_scene = BOOT;
     
     //Check PID file
     if (check_pid () != 0)

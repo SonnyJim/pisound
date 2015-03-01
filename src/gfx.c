@@ -1,5 +1,6 @@
 #include "pisound.h"
 #include "gfx.h"
+#include "scene.h"
 
 //Puts thousand separators into string
 char *render_score_to_string (long long score)
@@ -7,73 +8,6 @@ char *render_score_to_string (long long score)
     static char newstring[255];
     sprintf (newstring, "%'lld", score);
     return newstring;
-}
-
-static void render_score (void)
-{
-    int textWidth, textHeight, xpos, ypos;
-    char *score_string;
-    SDL_Color textColor;
-  
-    //Only update the score if it has changed
-    if (score != old_score)// || 
-           // (score == 0 && old_score == 0))
-    {
-        score_string = render_score_to_string (score);
-        TTF_SizeText (fonts[0], score_string, &textWidth, &textHeight);
-        xpos = (SCREEN_WIDTH - textWidth) / 2;
-        ypos = 120;
-        score_rect.x = xpos;
-        score_rect.y = ypos;
-        score_rect.w = textWidth;
-        score_rect.h = textHeight;
-        
-        //Inner text
-        textColor = (SDL_Color) { 82, 42, 0};
-        score_srf = TTF_RenderText_Solid( fonts[0], score_string, textColor );
-        score_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
-        SDL_FreeSurface (score_srf);
-        score_srf = NULL;
-        SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
-        SDL_SetTextureAlphaMod (score_tex, 150);
-        
-        //Outline
-        textColor = (SDL_Color) { 42, 22, 0};
-        score_srf = TTF_RenderText_Solid( fonts[1], score_string, textColor );
-        score_outline_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
-        SDL_FreeSurface (score_srf);
-        score_srf = NULL;
-        SDL_SetTextureBlendMode (score_outline_tex, SDL_BLENDMODE_BLEND);    
-        SDL_SetTextureAlphaMod (score_outline_tex, 200);
-        
-        old_score = score;
-    }
-    SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
-    SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
-   
-    //Render player number
-    if (player_num != old_player_num)
-    {
-        sprintf (score_string, "Player %d", player_num);
-        TTF_SizeText (fonts[2], score_string, &textWidth, &textHeight);
-
-        xpos = (SCREEN_WIDTH - textWidth) / 2;
-        ypos = 85;
-        
-        player_rect.x = xpos;
-        player_rect.y = ypos;
-        player_rect.w = textWidth;
-        player_rect.h = textHeight;
-        
-        textColor = (SDL_Color) { 0, 0, 0};
-        score_srf = TTF_RenderText_Solid( fonts[2], score_string, textColor );
-        player_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
-        SDL_FreeSurface (score_srf);
-        SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
-        SDL_SetTextureAlphaMod (score_tex, 200);
-        old_player_num = player_num;
-    }
-    SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
 }
 
 SDL_Texture* load_image_to_texture (char *filename)
@@ -122,75 +56,6 @@ void load_gfx (void)
     SDL_QueryTexture (peggysue_tex, NULL, NULL, &peggysue_rect.w, &peggysue_rect.h);
 }
 
-void render_sprite (void)
-{
-    if (x_up)
-        sprite_x -= 2;
-    else
-        sprite_x += 2;
-    
-    if (sprite_x >= SCREEN_WIDTH - sprite_rect.w)
-        x_up = 1;
-    else if (sprite_x <= 0)
-        x_up = 0;
-    sprite_y = SCREEN_HEIGHT /2 + 100;
-
-    sprite_rect.x = sprite_x;
-    sprite_rect.y = sprite_y;
-    SDL_RenderCopy (renderer, sprite_tex, NULL, &sprite_rect);
-}
-
-int scale, bigger;
-SDL_Rect zoom_rect;
-
-void render_logo (void)
-{
-    if (bigger)
-    {
-        if (++scale > 200)
-            bigger = 0;
-        
-    }
-    else
-    {
-        if (--scale <= 0)
-            bigger = 1;
-    }
-
-    zoom_rect.x = (SCREEN_WIDTH - scale) / 2;
-    zoom_rect.y = ((SCREEN_HEIGHT - scale) / 2) + 80;
-    zoom_rect.w = scale;
-    zoom_rect.h = scale;
-
-    if (zoom_rect.y + zoom_rect.h > SCREEN_HEIGHT)
-        bigger = 0;
-    SDL_RenderCopy (renderer, logo_tex, NULL, &zoom_rect);
-}
-
-double rotate_angle;
-void render_heads (void)
-{
-
-    billybob_rect.x = 0;
-    billybob_rect.y = 0;
-    
-    bubba_rect.x = SCREEN_WIDTH - bubba_rect.w;
-    bubba_rect.y = 0;
-
-    grandpa_rect.x = SCREEN_WIDTH - grandpa_rect.w;
-    grandpa_rect.y = SCREEN_HEIGHT -  grandpa_rect.h;
-
-    peggysue_rect.x = 0;
-    peggysue_rect.y = SCREEN_HEIGHT -  peggysue_rect.h;
-
-    if (++rotate_angle >= 360)
-        rotate_angle = 0;
-    SDL_RenderCopyEx (renderer, billybob_tex, NULL, &billybob_rect, rotate_angle, NULL, 0);
-    SDL_RenderCopyEx (renderer, bubba_tex, NULL, &bubba_rect, 360 - rotate_angle, NULL, 0);
-    SDL_RenderCopyEx (renderer, grandpa_tex, NULL, &grandpa_rect, rotate_angle, NULL, 0);
-    SDL_RenderCopyEx (renderer, peggysue_tex, NULL, &peggysue_rect, 360 - rotate_angle, NULL, 0);
-}
-
 void show_pisound_logo (void)
 {
     int textWidth, textHeight, xpos, ypos, i=0;
@@ -205,7 +70,7 @@ void show_pisound_logo (void)
     SDL_QueryTexture (loading_tex, NULL, NULL, &loading_rect.w, &loading_rect.h);
     
     frog_dstrect.x = SCREEN_WIDTH / 2;
-    frog_dstrect.y = SCREEN_HEIGHT / 2;
+    frog_dstrect.y = SCREEN_HEIGHT - 64;
     frog_dstrect.w = 64;
     frog_dstrect.h = 64;
 
@@ -275,6 +140,17 @@ int init_screen (void)
         return 1;
     }
 
+    numdrivers = SDL_GetNumVideoDrivers ();
+
+    if (verbose)
+    {
+        fprintf (stdout, "Found %i video drivers\n", numdrivers);
+        for (i = 0; i < numdrivers; i++)
+        {
+            fprintf (stdout, "Driver %i: %s\n", i,  SDL_GetVideoDriver(i));
+        }
+    }
+
     numdrivers = SDL_GetNumRenderDrivers ();
 
     if (verbose)
@@ -303,7 +179,7 @@ int init_screen (void)
     if (renderer == NULL)
     {
         fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+        renderer = SDL_CreateRenderer(window, -1, 0);
         if (renderer == NULL)
         {
             fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
@@ -316,27 +192,11 @@ int init_screen (void)
     return 0;
 }
 
-void init_gfx_vars (void)
-{
-    old_player_num = 0;
-    player_num = 1;
-    old_score = 1;
-
-    sprite_x = 0;
-    sprite_y = 0;
-    x_up = 0;
-    y_up = 0;
-    rotate_angle = 0;
-
-    scale = 0;
-    bigger = 1;
-}
-
 int load_gfx_resources (void)
 {
     load_gfx ();
     load_fonts ();
-    init_gfx_vars ();
+    //init_gfx_vars ();
     return 0;
 }
 
@@ -344,15 +204,13 @@ void* gfx_thread (void *ptr)
 {
     int font_num;
 
-
     //Set locale for thousand separator in render_score
     setlocale(LC_NUMERIC, "");
 
     if (init_screen () != 0)
     {
         fprintf (stderr, "Error setting up screen\n");
-        return (void *) 1;
-        //pthread_exit (NULL);
+        return NULL;
     }
 
     //show logo also loads resources
@@ -363,22 +221,8 @@ void* gfx_thread (void *ptr)
 
     fprintf (stdout, "Finished loading resources\n");
 
-    background_srf = SDL_LoadBMP("images/background.bmp");
-    if (background_srf == NULL)
-    {
-        fprintf (stderr, "Error loading background: %s\n", SDL_GetError());
-        pthread_exit (NULL);
-    }
-    
-    background_tex = SDL_CreateTextureFromSurface(renderer, background_srf);
-    if (background_tex == NULL)
-    {
-        fprintf (stderr, "Error creating background texture: %s\n", SDL_GetError());
-        pthread_exit (NULL);
-    }
-    
-    SDL_FreeSurface (background_srf);
-    background_srf = NULL;
+   // if (play_video () != 0)
+   //     fprintf (stderr, "Something broke whilst playing a video\n");
     
     if (cfg_show_fps)
     {
@@ -388,12 +232,35 @@ void* gfx_thread (void *ptr)
     while (running)
     {
         SDL_RenderClear(renderer);
-        SDL_RenderCopy (renderer, background_tex, NULL, NULL);
-        render_score ();
-        render_heads ();
-        render_logo ();
-        //render_sprite ();
-        SDL_RenderPresent (renderer);
+        switch (current_scene)
+        {
+            case BOOT:
+                draw_boot ();
+                break;
+            case AMODE:
+                draw_amode ();
+                break;
+            case GAME:
+                draw_game ();
+                break;
+            case GAMEOVER:
+                draw_gameover ();
+                break;
+            case HSENTRY:
+                draw_hsentry ();
+                break;
+            case TEST:
+                draw_test ();
+                break;
+            case TILT:
+                draw_tilt ();
+                break;
+            default:
+                draw_amode ();
+                break;
+        }
+
+       SDL_RenderPresent (renderer);
         
         if (cfg_show_fps)
         {

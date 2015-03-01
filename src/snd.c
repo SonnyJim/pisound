@@ -1,5 +1,6 @@
 #include "pisound.h"
 #include "queue.h"
+#include "volume.h"
 
 //Initialise the sound array with NULL pointers
 void init_sounds (void)

@@ -84,3 +84,5 @@ long long old_score;
 int fpsStart;
 int fpsFrames;
 float fpsAvg;
+
+void init_gfx_vars (void);
