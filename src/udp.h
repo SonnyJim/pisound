@@ -20,6 +20,7 @@
 #define UDP_SCORE       0xe0
 #define UDP_PLAYER_NUM  0xe1
 
+#define UDP_QUIT        0xfc
 #define UDP_PING        0xfe
 #define UDP_PONG        "PONG"
 #define UDP_VERSION     0xff

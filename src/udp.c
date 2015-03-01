@@ -103,6 +103,9 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
         case UDP_PLAYER_NUM:
             udp_player_num (byte2);
             break;
+        case UDP_QUIT:
+            running = 0;
+            break;
         default:
             fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
             udp_send_cmd_error (cliaddr);
