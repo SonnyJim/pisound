@@ -71,6 +71,15 @@ def send_thread ():
         elif readkey == "Q":
             print "Shutting down pisound server"
             message = "fc"
+        elif readkey == "c":
+            message = "fb"
+            message += raw_input ("Enter scene number: ")
+        elif readkey == "S":
+            message = "e0"
+            message += raw_input ("Enter score: ")
+        elif readkey == "P":
+            message = "e1"
+            message += raw_input ("Enter player number: ")
         elif readkey == "q":
             running = 0
 
@@ -83,13 +92,16 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 print "Simple UDP test client"
 print "======================"
 print "\n+/- Volume up/down"
-print "s send sound"
-print "m send music"
-print "v set volume"
-print "p ping!"
-print "t send custom message"
-print "Q shutdown pisound"
-print "q quit"
+print "s            Send sound code"
+print "m            Send music code"
+print "v            Set volume"
+print "c            Change scene"
+print "S            Send score"
+print "P            Change player"
+print "p            Ping!"
+print "t            Send custom message"
+print "Q            Shutdown pisound"
+print "q            Quit UDP client"
 
 thread.start_new_thread (recv_thread, ())
 send_thread ()

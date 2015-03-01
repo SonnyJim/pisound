@@ -13,48 +13,24 @@ char *render_score_to_string (long long score)
 SDL_Texture* load_image_to_texture (char *filename)
 {
     SDL_Texture* dst_texture = NULL;
+    SDL_Surface* src_surface = NULL;
 
     if (verbose)
         fprintf (stdout, "Loading %s\n", filename);
-    sprite_srf = IMG_Load(filename);
+    src_surface = IMG_Load(filename);
     
-    if (sprite_srf == NULL)
+    if (src_surface == NULL)
         fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
     else
     {
-        dst_texture = SDL_CreateTextureFromSurface (renderer, sprite_srf);
+        dst_texture = SDL_CreateTextureFromSurface (renderer, src_surface);
         if (dst_texture == NULL)
             fprintf (stderr, "Error loading image to texture: %s %s\n", filename, SDL_GetError());
-        SDL_FreeSurface (sprite_srf);
+        SDL_FreeSurface (src_surface);
     }
     return dst_texture;
 }
 
-void load_gfx (void)
-{
-    sprite_srf = IMG_Load("images/shaving.png");
-    if (sprite_srf == NULL)
-        fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
-    sprite_tex = SDL_CreateTextureFromSurface (renderer, sprite_srf);
-    SDL_FreeSurface (sprite_srf);
-    sprite_srf = NULL;
-    SDL_QueryTexture (sprite_tex, NULL, NULL, &sprite_rect.w, &sprite_rect.h);
-
-    logo_tex = load_image_to_texture ("images/hbb_logo.png");
-    SDL_QueryTexture (logo_tex, NULL, NULL, &logo_rect.w, &logo_rect.h);
-
-    billybob_tex = load_image_to_texture (IMG_BILLYBOB);
-    SDL_QueryTexture (billybob_tex, NULL, NULL, &billybob_rect.w, &billybob_rect.h);
-    
-    bubba_tex = load_image_to_texture (IMG_BUBBA);
-    SDL_QueryTexture (bubba_tex, NULL, NULL, &bubba_rect.w, &bubba_rect.h);
-
-    grandpa_tex = load_image_to_texture (IMG_GRANDPA);
-    SDL_QueryTexture (grandpa_tex, NULL, NULL, &grandpa_rect.w, &grandpa_rect.h);
-
-    peggysue_tex = load_image_to_texture (IMG_PEGGYSUE);
-    SDL_QueryTexture (peggysue_tex, NULL, NULL, &peggysue_rect.w, &peggysue_rect.h);
-}
 
 void show_pisound_logo (void)
 {
@@ -62,11 +38,26 @@ void show_pisound_logo (void)
     char loading_text[4][12] = { "Loading |", "Loading /", "Loading -", "Loading \\" };
     load_gfx_resources ();
 
+    SDL_Texture *logo_tex = NULL;
+    SDL_Rect    logo_rect;
+
+    SDL_Texture *loading_tex = NULL;
+    SDL_Rect    loading_rect;
+    SDL_Surface *loading_srf;
+
+    SDL_Texture *loading_txt_tex = NULL;
+    SDL_Rect    loading_txt_rect;
+    SDL_Surface *loading_txt_srf;
+
+
     SDL_Texture *frog_tex = load_image_to_texture ("images/frog.png");
     SDL_Rect    frog_srcrect;
     SDL_Rect    frog_dstrect;
     loading_tex = load_image_to_texture ("images/pisound_logo.png");
-
+    
+    logo_tex = load_image_to_texture ("images/hbb_logo.png");
+   
+    SDL_QueryTexture (logo_tex, NULL, NULL, &logo_rect.w, &logo_rect.h);
     SDL_QueryTexture (loading_tex, NULL, NULL, &loading_rect.w, &loading_rect.h);
     
     frog_dstrect.x = SCREEN_WIDTH / 2;
@@ -108,6 +99,11 @@ void show_pisound_logo (void)
             i = 0;
 
     }
+    //Clean up textures
+    SDL_DestroyTexture (logo_tex);
+    SDL_DestroyTexture (loading_tex);
+    SDL_DestroyTexture (loading_txt_tex);
+    SDL_DestroyTexture (frog_tex);
 }
 
 int init_screen (void)
@@ -194,7 +190,7 @@ int init_screen (void)
 
 int load_gfx_resources (void)
 {
-    load_gfx ();
+    //load_gfx ();
     load_fonts ();
     //init_gfx_vars ();
     return 0;
@@ -229,6 +225,8 @@ void* gfx_thread (void *ptr)
         fpsFrames = 0;
         fpsStart = SDL_GetTicks ();
     }
+
+    gfx_init_game_vars ();
     while (running)
     {
         SDL_RenderClear(renderer);

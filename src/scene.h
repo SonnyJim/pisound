@@ -1,6 +1,6 @@
 #define MAX_SCENES 6
 
-int current_scene;
+int current_scene, running_scene;
 
 void draw_boot (void);
 void draw_amode (void);
@@ -18,7 +18,8 @@ enum scenes {
     GAMEOVER,
     HSENTRY,
     TEST,
-    TILT
+    TILT,
+    INVALID_SCENE
 };
 
-
+void scene_set (int scene);

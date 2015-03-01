@@ -9,5 +9,3 @@ const char *scene_names[] = {
     "Test mode",
     "TILT"
 };
-
-
