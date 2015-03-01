@@ -68,8 +68,10 @@ def send_thread ():
             message = "fe"
         elif readkey == "t":
             message = raw_input ("Enter in custom message: ")
+        elif readkey == "Q":
+            message = "fc"
         elif readkey == "q":
-            running = 0;
+            running = 0
 
         if len(message) > 0:
             sock.sendto(message, (IP, PORT))
@@ -85,6 +87,7 @@ print "m send music"
 print "v set volume"
 print "p ping!"
 print "t send custom message"
+print "Q shutdown pisound"
 print "q quit"
 
 thread.start_new_thread (recv_thread, ())
