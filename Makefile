@@ -16,8 +16,8 @@ endif
 
 ifdef BUILD_GFX
 CFLAGS += -DBUILD_GFX
-LDLIBS += -lSDL2_ttf -lSDL2_image -lavformat -lavcodec -lavutil -lswscale
-OBJS += src/gfx.o src/gfx_font.o src/video.o
+LDLIBS += -lSDL2_ttf -lSDL2_image
+OBJS += src/gfx.o src/gfx_font.o
 OBJS += src/scenes/boot.o src/scenes/amode.o src/scenes/game.o src/scenes/gameover.o src/scenes/hsentry.o src/scenes/test.o src/scenes/tilt.o
 endif
 
