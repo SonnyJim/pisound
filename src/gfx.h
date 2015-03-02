@@ -35,3 +35,5 @@ void init_gfx_vars (void);
 
 char *render_score_to_string (long long score);
 SDL_Texture* load_image_to_texture (char *filename);
+
+void gfx_init_game_vars (void);
