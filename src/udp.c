@@ -144,7 +144,7 @@ void* udp_thread (void *ptr)
 
    memset (&servaddr, 0, sizeof(servaddr));
    servaddr.sin_family = AF_INET;
-   servaddr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+   servaddr.sin_addr.s_addr = htonl (INADDR_ANY);
    servaddr.sin_port = htons (UDP_PORT);
 
    if (bind (sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
