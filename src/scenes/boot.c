@@ -10,16 +10,27 @@ static void init_boot_scene (void)
 {
     if (verbose)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
+    
+    SDL_Surface * surface = IMG_Load ("images/hbb_logo.png");
+    
+    if (surface == NULL)
+    {
+        fprintf (stderr, "Error loading hbb_logo.png %s\n", SDL_GetError ());
+        return;
+    }
 
-    SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface = TTF_RenderText_Solid ( fonts[0], scene_names[current_scene], color);
     texture = SDL_CreateTextureFromSurface (renderer, surface);
     SDL_FreeSurface (surface);
-    SDL_QueryTexture (texture, NULL, NULL, &txtW, &txtH);
-    dstrect.x = SCREEN_WIDTH / 2;
-    dstrect.y = SCREEN_HEIGHT / 2;
-    dstrect.w = txtW;
-    dstrect.h = txtH;
+    if (texture == NULL)
+    {
+        fprintf (stderr, "Error creating texture from surface\n");
+        return;
+    }
+    
+    SDL_QueryTexture (texture, NULL, NULL, &dstrect.w, &dstrect.h);
+
+    dstrect.x = (SCREEN_WIDTH / 2) - (dstrect.w / 2);
+    dstrect.y = (SCREEN_HEIGHT / 2) - (dstrect.h / 2);
  
     running_scene = current_scene;
 }
