@@ -1,4 +1,4 @@
-BUILD_GPIO = y
+#BUILD_GPIO = y
 BUILD_GFX = y
 CC	= gcc
 SDL2_CFLAGS := $(shell sdl2-config --cflags)
@@ -26,6 +26,9 @@ all: pisound
 debug: CFLAGS += -g
 debug: pisound
 
+listdir: tools/listdir.o
+	@echo [link]
+	@$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 pisound: $(OBJS)
 	@echo [link]
@@ -33,5 +36,8 @@ pisound: $(OBJS)
 
 clean:
 	rm -rf src/*.o
-	rm -rf pisound
+	rm -rf tools/*.o
+	rm -f pisound
+	rm -f listdir
+
 
