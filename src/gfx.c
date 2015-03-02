@@ -34,75 +34,62 @@ SDL_Texture* load_image_to_texture (char *filename)
 
 void show_pisound_logo (void)
 {
-    int textWidth, textHeight, xpos, ypos, i=0;
-    char loading_text[4][12] = { "Loading |", "Loading /", "Loading -", "Loading \\" };
+#define FROG_SIZE 64
+    int anim_frame = 0, anim_step = 0, xpos = 0, ypos = 0;
     load_gfx_resources ();
 
-    SDL_Texture *logo_tex = NULL;
-    SDL_Rect    logo_rect;
-
-    SDL_Texture *loading_tex = NULL;
-    SDL_Rect    loading_rect;
-    SDL_Surface *loading_srf;
-
-    SDL_Texture *loading_txt_tex = NULL;
-    SDL_Rect    loading_txt_rect;
-    SDL_Surface *loading_txt_srf;
-
+    SDL_Texture *bootlogo_tex = NULL;
 
     SDL_Texture *frog_tex = load_image_to_texture ("images/frog.png");
     SDL_Rect    frog_srcrect;
     SDL_Rect    frog_dstrect;
-    loading_tex = load_image_to_texture ("images/pisound_logo.png");
-    
-    logo_tex = load_image_to_texture ("images/hbb_logo.png");
-   
-    SDL_QueryTexture (logo_tex, NULL, NULL, &logo_rect.w, &logo_rect.h);
-    SDL_QueryTexture (loading_tex, NULL, NULL, &loading_rect.w, &loading_rect.h);
-    
-    frog_dstrect.x = SCREEN_WIDTH / 2;
-    frog_dstrect.y = SCREEN_HEIGHT - 64;
-    frog_dstrect.w = 64;
-    frog_dstrect.h = 64;
+    bootlogo_tex = load_image_to_texture ("images/pisound_logo.png");
+
+    frog_dstrect.x = SCREEN_WIDTH - FROG_SIZE;
+    frog_dstrect.y = (SCREEN_HEIGHT / 2) + 130;
+    frog_dstrect.w = FROG_SIZE;
+    frog_dstrect.h = FROG_SIZE;
 
     while (loading_resources != 0)
     {
-        TTF_SizeText (fonts[0], loading_text[i], &textWidth, &textHeight);
-        xpos = (SCREEN_WIDTH - textWidth) / 2;
-        ypos = SCREEN_HEIGHT - textHeight - 70;
-        loading_txt_rect.x = xpos;
-        loading_txt_rect.y = ypos;
-        loading_txt_rect.w = textWidth;
-        loading_txt_rect.h = textHeight;
- 
-        textColor = (SDL_Color) { 0, 0, 255};
-        loading_txt_srf = TTF_RenderText_Solid( fonts[0], loading_text[i], textColor );
-        loading_txt_tex = SDL_CreateTextureFromSurface(renderer, loading_txt_srf);
-        SDL_FreeSurface (loading_srf);
-        loading_srf = NULL;
-
-        frog_srcrect.x = 0 + (i * 64);
+        frog_srcrect.x = 0 + (anim_frame * FROG_SIZE);
         frog_srcrect.y = 0;
-        frog_srcrect.w = 64;
-        frog_srcrect.h = 64;
+        frog_srcrect.w = FROG_SIZE;
+        frog_srcrect.h = FROG_SIZE;
 
         SDL_RenderClear (renderer);    
-        SDL_RenderCopy (renderer, loading_tex, NULL, NULL);
-        SDL_RenderCopy (renderer, loading_txt_tex, NULL, &loading_txt_rect);
+        SDL_RenderCopy (renderer, bootlogo_tex, NULL, NULL);
         SDL_RenderCopy (renderer, frog_tex, &frog_srcrect, &frog_dstrect);
         SDL_RenderPresent (renderer);
-        SDL_Delay (500);
+        SDL_Delay (150);
+    
+        if (anim_step < 3)
+        {
+            anim_frame++;
+            frog_dstrect.y -= 20;
+        }
+        else if (anim_step < 6)
+        {
+            anim_frame--;
+            frog_dstrect.y += 20;
+        }
+        anim_step++;
+        if (anim_step == 7)
+        {
+            anim_step = 0;
+            anim_frame = 0;
+        }
 
-        if (i < 3)
-            i++;
-        else
-            i = 0;
+        if (anim_frame != 0)
+            frog_dstrect.x -= 10;
+        if (frog_dstrect.x <= 0)
+            frog_dstrect.x = SCREEN_WIDTH - FROG_SIZE;
+
+
 
     }
     //Clean up textures
-    SDL_DestroyTexture (logo_tex);
-    SDL_DestroyTexture (loading_tex);
-    SDL_DestroyTexture (loading_txt_tex);
+    SDL_DestroyTexture (bootlogo_tex);
     SDL_DestroyTexture (frog_tex);
 }
 

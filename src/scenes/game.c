@@ -17,7 +17,7 @@ static void init_game_scene (void)
     if (verbose)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
 
-    background_srf = SDL_LoadBMP("images/background.bmp");
+    background_srf = SDL_LoadBMP("images/backgrounds/sign.bmp");
     if (background_srf == NULL)
         fprintf (stderr, "Error loading background: %s\n", SDL_GetError());
     
