@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">PiSound UDP Client</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="scenes_array">
+        <item>Boot</item>
+        <item>Attract Mode</item>
+        <item>Game</item>
+        <item>Game Over</item>
+        <item>High Score Entry</item>
+        <item>Test</item>
+        <item>Tilt</item>
+    </string-array>
+
+</resources>

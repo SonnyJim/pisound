@@ -1,0 +1,96 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".UDP"
+    android:screenOrientation="portrait">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ping"
+        android:id="@+id/PingBtn"
+        android:onClick="SendPing"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shutdown"
+        android:onClick="SendShutdown"
+        android:id="@+id/ShutdownBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:id="@+id/button2"
+        android:onClick="SendCustomMsg"
+        android:layout_alignStart="@+id/PingBtn"
+        android:layout_alignEnd="@+id/PingBtn"
+        android:layout_alignParentTop="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/CustomText"
+        android:hint="Enter Custom Message"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/button2"
+        android:layout_alignBottom="@+id/button2"
+        android:inputType="text" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:layout_below="@+id/CustomText"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/button2" />
+
+    <NumberPicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/SndPicker"
+        android:layout_below="@+id/spinner"
+        android:layout_alignParentStart="true"
+        />
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play Snd"
+        android:id="@+id/SndBtn"
+        android:onClick="SendSnd"
+        android:layout_below="@+id/SndPicker"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/SndPicker" />
+
+    <NumberPicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/MusPicker"
+        android:layout_above="@+id/SndBtn"
+        android:layout_toEndOf="@+id/ShutdownBtn" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play Mus"
+        android:id="@+id/MusBtn"
+        android:onClick="SendMus"
+        android:layout_alignTop="@+id/SndBtn"
+        android:layout_alignEnd="@+id/MusPicker"
+        android:layout_alignStart="@+id/MusPicker"
+        android:layout_alignBottom="@+id/SndBtn" />
+
+
+</RelativeLayout>
