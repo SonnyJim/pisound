@@ -90,6 +90,8 @@ int init_audio (void)
 
     //Configure maximum amount of simultaenous voices
     Mix_AllocateChannels(max_voices);
+    if (verbose)
+        fprintf (stdout, "Max voices %i\n", max_voices);
     
     //Initialise the sound_queue
     queue_init (&sfx_q);
