@@ -4,19 +4,10 @@
 #include "gfx.h"
 #include "scene.h"
 
-static void udp_send_pong (struct sockaddr_in cliaddr)
+static void udp_send_msg (char *msg, struct sockaddr_in cliaddr)
 {
-    sendto(sockfd, UDP_PONG, strlen (UDP_PONG),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
-}
-
-static void udp_send_version (struct sockaddr_in cliaddr)
-{
-    sendto(sockfd, UDP_VERSION_STRING, strlen (UDP_VERSION_STRING),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
-}
-
-static void udp_send_cmd_error (struct sockaddr_in cliaddr)
-{
-    sendto(sockfd, UDP_CMD_ERROR, strlen (UDP_CMD_ERROR),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+    cliaddr.sin_port = htons (UDP_PORT);
+    sendto(sockfd, msg, strlen (msg),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
 }
 
 static void udp_score_receive (char *msg)
@@ -36,7 +27,7 @@ static void udp_scene_receive (long scene)
     else
     {
         fprintf (stderr, "Error: requested scene %lu out of range\n", scene);
-        udp_send_cmd_error (cliaddr);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
 }
 
@@ -49,7 +40,7 @@ static void udp_player_num (long num)
     else
     {
         fprintf (stderr, "Error: udp_player_num out of range\n");
-        udp_send_cmd_error (cliaddr);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
 }
 
@@ -66,24 +57,24 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
     byte2 = strtol (code, NULL, 16);
 
     //Error checking
-    if (strlen (msg) < 2)
+    if (strlen (msg) < 1)
     {
         fprintf (stderr, "Error in udp_decode_msg: empty message");
-        udp_send_cmd_error (cliaddr);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
         return;
     }
     else if (strlen (msg) < 4 
-            && (byte1 == UDP_SOUND_PLAY || byte1 == UDP_MUSIC_PLAY || byte1 == UDP_SCENE_CHANGE))
+            && (byte1 != UDP_SOUND_PLAY || byte1 != UDP_MUSIC_PLAY || byte1 == UDP_SCENE_CHANGE))
     {
         fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
         fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
-        udp_send_cmd_error (cliaddr);
-        return;
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
+        //return;
     }
 
     if (byte1 > 255 || byte2 > 255)
     {
-        udp_send_cmd_error (cliaddr);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
         fprintf (stderr, "Error in udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
     }
 
@@ -111,10 +102,10 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
             volume_set (byte2);
             break;
         case UDP_PING:
-            udp_send_pong (cliaddr);
+            udp_send_msg (UDP_MSG_PING, cliaddr);
             break;
         case UDP_VERSION:
-            udp_send_version (cliaddr);
+            udp_send_msg (UDP_MSG_VERSION, cliaddr);
             break;
         case UDP_SCORE:
             udp_score_receive (msg);
@@ -122,7 +113,7 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
         case UDP_PLAYER_NUM:
             udp_player_num (byte2);
             break;
-        case UDP_QUIT:
+        case UDP_SHUTDOWN:
             running = 0;
             break;
         case UDP_SCENE_CHANGE:
@@ -130,7 +121,7 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
             break;
         default:
             fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
-            udp_send_cmd_error (cliaddr);
+            udp_send_msg (UDP_MSG_ERROR, cliaddr);
             break;
     }
 }
@@ -161,7 +152,7 @@ void* udp_thread (void *ptr)
            n = recvfrom (sockfd, mesg, UDP_BUFFLEN, 0, (struct sockaddr *) &cliaddr,&len);
            //Echo request
            //sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
-           mesg[n] = 0;
+           //mesg[n] = 0;
            udp_decode_msg (mesg, cliaddr);
            memset (mesg, 0, sizeof(mesg));
        }

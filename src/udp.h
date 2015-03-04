@@ -21,17 +21,17 @@
 #define UDP_PLAYER_NUM      0xe1
 
 #define UDP_SCENE_CHANGE    0xfb
-#define UDP_QUIT            0xfc
+#define UDP_SHUTDOWN        0xfc
 #define UDP_PING            0xfe
-#define UDP_PONG            "PONG"
 #define UDP_VERSION         0xff
-#define UDP_VERSION_STRING "Pisound V0.1"
 
 #define UDP_PORT            8008
 #define UDP_BUFFLEN         256
 
 //Sent to client when an error occurs
-#define UDP_CMD_ERROR "ERROR"
+#define UDP_MSG_ERROR   "ERROR"
+#define UDP_MSG_PING    "PONG"
+#define UDP_MSG_VERSION "Pisound V0.1"
 
 int sockfd,n;
 struct sockaddr_in servaddr,cliaddr;
