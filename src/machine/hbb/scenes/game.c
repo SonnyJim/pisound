@@ -22,7 +22,7 @@ static void init_game_scene (void)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
     
     
-    background_srf = IMG_Load ("images/backgrounds/sign.png");
+    background_srf = IMG_Load ("data/hbb/gfx/backgrounds/sign.png");
     if (background_srf == NULL)
         fprintf (stderr, "Error loading background: %s\n", SDL_GetError());
     

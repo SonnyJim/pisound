@@ -11,7 +11,7 @@ static void init_boot_scene (void)
     if (verbose)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
     
-    SDL_Surface * surface = IMG_Load ("images/hbb_logo.png");
+    SDL_Surface * surface = IMG_Load ("data/hbb/gfx/hbb_logo.png");
     
     if (surface == NULL)
     {
