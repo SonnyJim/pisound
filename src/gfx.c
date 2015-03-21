@@ -96,7 +96,6 @@ void show_pisound_logo (void)
 int init_screen (void)
 {
     int i, numdrivers;
-    SDL_RendererInfo drinfo; 
 
     if (SDL_Init (SDL_INIT_VIDEO) != 0)
     {

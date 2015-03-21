@@ -14,6 +14,7 @@ SDL_Color textColor;
 SDL_DisplayMode videomode;
 SDL_Window *window;
 SDL_Renderer *renderer;
+SDL_RendererInfo drinfo; 
 
 int SCREEN_HEIGHT;
 int SCREEN_WIDTH;
