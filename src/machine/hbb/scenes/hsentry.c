@@ -1,6 +1,6 @@
-#include "../pisound.h"
-#include "../gfx.h"
-#include "../scene.h"
+#include "pisound.h"
+#include "gfx.h"
+#include "scene.h"
 
 SDL_Texture * texture;
 SDL_Rect dstrect;

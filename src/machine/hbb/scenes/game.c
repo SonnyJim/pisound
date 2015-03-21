@@ -1,6 +1,6 @@
-#include "../pisound.h"
-#include "../gfx.h"
-#include "../scene.h"
+#include "pisound.h"
+#include "gfx.h"
+#include "scene.h"
 #include "game.h"
 
 void gfx_init_game_vars (void)
@@ -11,13 +11,18 @@ void gfx_init_game_vars (void)
     score = 0;
 }
 
+void game_sign_init (void)
+{
+    fprintf (stdout, "Initialising game_sign subscene\n");
+}
 
 static void init_game_scene (void)
 {
     if (verbose)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
-
-    background_srf = SDL_LoadBMP("images/backgrounds/sign.bmp");
+    
+    
+    background_srf = IMG_Load ("images/backgrounds/sign.png");
     if (background_srf == NULL)
         fprintf (stderr, "Error loading background: %s\n", SDL_GetError());
     
@@ -96,7 +101,7 @@ static void render_score (void)
     SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
 }
 
-
+/*
 void load_gfx (void)
 {
     sprite_srf = IMG_Load("images/shaving.png");
@@ -120,6 +125,7 @@ void load_gfx (void)
     peggysue_tex = load_image_to_texture (IMG_PEGGYSUE);
     SDL_QueryTexture (peggysue_tex, NULL, NULL, &peggysue_rect.w, &peggysue_rect.h);
 }
+*/
 
 void draw_game (void)
 {

@@ -35,7 +35,7 @@ SDL_Texture* load_image_to_texture (char *filename)
 void show_pisound_logo (void)
 {
 #define FROG_SIZE 64
-    int anim_frame = 0, anim_step = 0, xpos = 0, ypos = 0;
+    int anim_frame = 0, anim_step = 0;
     load_gfx_resources ();
 
     SDL_Texture *bootlogo_tex = NULL;
@@ -217,35 +217,8 @@ void* gfx_thread (void *ptr)
     while (running)
     {
         SDL_RenderClear(renderer);
-        switch (current_scene)
-        {
-            case BOOT:
-                draw_boot ();
-                break;
-            case AMODE:
-                draw_amode ();
-                break;
-            case GAME:
-                draw_game ();
-                break;
-            case GAMEOVER:
-                draw_gameover ();
-                break;
-            case HSENTRY:
-                draw_hsentry ();
-                break;
-            case TEST:
-                draw_test ();
-                break;
-            case TILT:
-                draw_tilt ();
-                break;
-            default:
-                draw_amode ();
-                break;
-        }
-
-       SDL_RenderPresent (renderer);
+        scene_draw ();
+        SDL_RenderPresent (renderer);
         
         if (cfg_show_fps)
         {
