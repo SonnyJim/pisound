@@ -7,10 +7,12 @@ SDL_Rect dstrect;
 
 SDL_Texture *scroller;
 SDL_Rect scrlrect;
+int line = 0;
 
-static char scroller_text[] = "This is a really long piece of text to demonstrate what scrolling text looks like.  How awesome!\
-                                I think I'm about to mess my pants it's that cool.  Really gives you that 1980's demo vibe, doesn't it?\
-                                 Oh well, should stop round about now, I'm rambling and there's work to be done.  Toodlepips!";
+const char *scroller_text[4] = {"This is a really long piece of text to demonstrate what scrolling text looks like.",  
+                               "How awesome! I think I'm about to mess my pants it's that cool.",  
+                               "Really gives you that 1980's demo vibe, doesn't it Oh well, should stop round about now",
+                               "I'm rambling and there's work to be done.  Toodlepips!"};
 
 static void init_amode_scene (void)
 {
@@ -18,7 +20,7 @@ static void init_amode_scene (void)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
 
     SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface = TTF_RenderText_Solid ( FON_CHIZ_BOLD_80, scene_names[current_scene], color);
+    SDL_Surface * surface = TTF_RenderText_Blended ( FON_CHIZ_BOLD_80, scene_names[current_scene], color);
     texture = SDL_CreateTextureFromSurface (renderer, surface);
     SDL_FreeSurface (surface);
     SDL_QueryTexture (texture, NULL, NULL, &dstrect.w, &dstrect.h);
@@ -31,11 +33,13 @@ static void init_amode_scene (void)
 static void create_scroller_texture (void)
 {
     SDL_Color color = { 255, 0, 0 };
-    SDL_Surface * surface = TTF_RenderText_Solid ( FON_ALFPHA_36, scroller_text, color);
+    SDL_Surface * surface = TTF_RenderText_Solid ( FON_ALFPHA_20, scroller_text[line], color);
     scroller = SDL_CreateTextureFromSurface (renderer, surface);
+    if (scroller == NULL)
+        fprintf (stdout, "Scroller error %s\n", scroller_text[line]);
     SDL_FreeSurface (surface);
-    SDL_QueryTexture (texture, NULL, NULL, &scrlrect.w, &scrlrect.h);
-    scrlrect.y = SCREEN_HEIGHT - scrlrect.h;
+    SDL_QueryTexture (scroller, NULL, NULL, &scrlrect.w, &scrlrect.h);
+    scrlrect.y = SCREEN_HEIGHT - (scrlrect.h * 2);
     scrlrect.x = SCREEN_WIDTH;
 
 }
@@ -44,6 +48,14 @@ static void draw_scroller (void)
 {
     SDL_RenderCopy (renderer, scroller, NULL, &scrlrect);
     scrlrect.x--;
+    //scrlrect.x goes minus, innit, so when it hits 0, wrap to the next line
+    if (scrlrect.w + scrlrect.x <= 0)
+    {
+        line++;
+        if (line > 4)
+            line = 0;
+        create_scroller_texture ();
+    }
 }
 
 int draw_amode (void)
