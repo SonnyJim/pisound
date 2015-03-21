@@ -2,6 +2,8 @@
 #include <locale.h> //Used to set locale for score separator
 #include <SDL2/SDL_image.h>
 
+#include "fonts.h"
+
 //#define SCORE_SEPARATOR ','
 #define MAX_FONTS 255
 #define CFG_FONT_FILE "fonts.cfg"

@@ -21,11 +21,12 @@ static void init_test_scene (void)
     running_scene = current_scene;
 }
 
-void draw_test (void)
+int draw_test (void)
 {
     if (current_scene != running_scene)
         init_test_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    return 1;
 }
 
