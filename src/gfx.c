@@ -207,7 +207,7 @@ void* gfx_thread (void *ptr)
     while (running)
     {
         SDL_RenderClear(renderer);
-        if (!scene_draw ())
+        if (scene_draw ())
         {
             fprintf (stderr, "Error in scene_draw()\n");
             running = 0;
