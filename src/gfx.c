@@ -162,7 +162,7 @@ int init_screen (void)
     if (renderer == NULL)
     {
         fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
-        renderer = SDL_CreateRenderer(window, -1, 0);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
         if (renderer == NULL)
         {
             fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
@@ -191,6 +191,7 @@ void* gfx_thread (void *ptr)
     if (init_screen () != 0)
     {
         fprintf (stderr, "Error setting up screen\n");
+        running = 0;
         return NULL;
     }
 
