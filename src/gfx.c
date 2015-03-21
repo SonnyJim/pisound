@@ -132,6 +132,7 @@ int init_screen (void)
         {
             fprintf (stdout, "Driver %i: %s\n", i,  SDL_GetVideoDriver(i));
         }
+        fprintf (stdout, "Using %s\n", SDL_GetCurrentVideoDriver());
     }
 
     numdrivers = SDL_GetNumRenderDrivers ();
@@ -145,19 +146,8 @@ int init_screen (void)
             fprintf (stdout, "Driver %i: %s\n", i, drinfo.name);
         }
     }
-    
-    //Try all the different SDL2 drivers until we find one that works ;-)
-    for (i = 0; i < numdrivers; i++)
-    {
-        if (verbose)
-            fprintf (stdout, "Trying render driver %i\n", i);
-        renderer = SDL_CreateRenderer(window, i, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-        
-        if (renderer == NULL)
-            fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
-        else
-            break;
-    }
+   
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     
     if (renderer == NULL)
     {
@@ -165,13 +155,14 @@ int init_screen (void)
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
         if (renderer == NULL)
         {
-            fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
+            fprintf (stderr, "Error creating software renderer: %s\n", SDL_GetError());
             return 1;
         }
     }
-    
-    SDL_GetRenderDriverInfo (i, &drinfo);
+
+    SDL_GetRendererInfo (renderer, &drinfo);
     fprintf (stdout, "Using %s driver\n", drinfo.name);
+
     return 0;
 }
 
