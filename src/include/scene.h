@@ -2,15 +2,15 @@
 
 int current_scene, running_scene, current_subscene, running_subscene;
 
-void scene_draw (void);
+int scene_draw (void);
 
-void draw_boot (void);
-void draw_amode (void);
-void draw_game (void);
-void draw_gameover (void);
-void draw_hsentry (void);
-void draw_test (void);
-void draw_tilt (void);
+int draw_boot (void);
+int draw_amode (void);
+int draw_game (void);
+int draw_gameover (void);
+int draw_hsentry (void);
+int draw_test (void);
+int draw_tilt (void);
 
 extern const char *scene_names[];
 enum scenes {

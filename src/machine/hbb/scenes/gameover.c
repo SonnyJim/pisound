@@ -21,11 +21,12 @@ static void init_gameover_scene (void)
     running_scene = current_scene;
 }
 
-void draw_gameover (void)
+int draw_gameover (void)
 {
     if (current_scene != running_scene)
         init_gameover_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    return 1;
 }
 

@@ -21,11 +21,12 @@ static void init_amode_scene (void)
     running_scene = current_scene;
 }
 
-void draw_amode (void)
+int draw_amode (void)
 {
     if (current_scene != running_scene)
         init_amode_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    return 1;
 }
 

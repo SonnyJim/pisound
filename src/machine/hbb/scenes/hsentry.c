@@ -21,11 +21,12 @@ static void init_hsentry_scene (void)
     running_scene = current_scene;
 }
 
-void draw_hsentry (void)
+int draw_hsentry (void)
 {
     if (current_scene != running_scene)
         init_hsentry_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    return 1;
 }
 

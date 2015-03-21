@@ -177,9 +177,7 @@ int init_screen (void)
 
 int load_gfx_resources (void)
 {
-    //load_gfx ();
     load_fonts ();
-    //init_gfx_vars ();
     return 0;
 }
 
@@ -217,7 +215,11 @@ void* gfx_thread (void *ptr)
     while (running)
     {
         SDL_RenderClear(renderer);
-        scene_draw ();
+        if (!scene_draw ())
+        {
+            fprintf (stderr, "Error in scene_draw()\n");
+            running = 0;
+        }
         SDL_RenderPresent (renderer);
         
         if (cfg_show_fps)

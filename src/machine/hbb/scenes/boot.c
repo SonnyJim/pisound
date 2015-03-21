@@ -1,3 +1,4 @@
+//This scene is shown whilst we are waiting for the machine to boot up
 #include "pisound.h"
 #include "gfx.h"
 #include "scene.h"
@@ -6,7 +7,7 @@ int txtW, txtH;
 SDL_Texture * texture;
 SDL_Rect dstrect;
 
-static void init_boot_scene (void)
+static int init_boot_scene (void)
 {
     if (verbose)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
@@ -16,7 +17,7 @@ static void init_boot_scene (void)
     if (surface == NULL)
     {
         fprintf (stderr, "Error loading hbb_logo.png %s\n", SDL_GetError ());
-        return;
+        return 0;
     }
 
     texture = SDL_CreateTextureFromSurface (renderer, surface);
@@ -24,7 +25,7 @@ static void init_boot_scene (void)
     if (texture == NULL)
     {
         fprintf (stderr, "Error creating texture from surface\n");
-        return;
+        return 0;
     }
     
     SDL_QueryTexture (texture, NULL, NULL, &dstrect.w, &dstrect.h);
@@ -33,14 +34,16 @@ static void init_boot_scene (void)
     dstrect.y = (SCREEN_HEIGHT / 2) - (dstrect.h / 2);
  
     running_scene = current_scene;
+    return 1;
 }
 
-void draw_boot (void)
+int draw_boot (void)
 {
+    int ret = 0;
     if (current_scene != running_scene)
-        init_boot_scene ();
+        ret = init_boot_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
-
+    return ret;
 }
 

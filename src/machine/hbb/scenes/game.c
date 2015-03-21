@@ -16,7 +16,7 @@ void game_sign_init (void)
     fprintf (stdout, "Initialising game_sign subscene\n");
 }
 
-static void init_game_scene (void)
+static int init_game_scene (void)
 {
     if (verbose)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
@@ -24,15 +24,22 @@ static void init_game_scene (void)
     
     background_srf = IMG_Load ("data/hbb/gfx/backgrounds/sign.png");
     if (background_srf == NULL)
+    {
         fprintf (stderr, "Error loading background: %s\n", SDL_GetError());
+        return 0;
+    }
     
     background_tex = SDL_CreateTextureFromSurface(renderer, background_srf);
    
     if (background_tex == NULL)
+    {
         fprintf (stderr, "Error creating background texture: %s\n", SDL_GetError());
+        return 0;
+    }
     SDL_FreeSurface (background_srf);
     
     running_scene = current_scene;
+    return 1;
 }
 
 static void render_score (void)
@@ -127,13 +134,15 @@ void load_gfx (void)
 }
 */
 
-void draw_game (void)
+int draw_game (void)
 {
+    int ret = 0;
     if (current_scene != running_scene)
-        init_game_scene ();
+        ret = init_game_scene ();
 
    
     SDL_RenderCopy (renderer, background_tex, NULL, NULL);
     render_score ();
+    return ret;
 }
 
