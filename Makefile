@@ -28,7 +28,7 @@ endif
 #HDRS += src/gfx.h 
 endif
 
-all: pisound
+all: fontgen pisound
 
 debug: CFLAGS += -g
 debug: pisound
@@ -37,7 +37,12 @@ OBJS += $(HDRS)
 
 listdir: tools/listdir.o
 	@echo [link]
-	@$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+	@$(CC) -o tools/$@ $^ $(LDFLAGS) $(LDLIBS)
+
+fontgen: tools/fontgen.o
+	@echo [Compiling fontgen]
+	@$(CC) -o tools/$@ $^ $(LDFLAGS) $(LDLIBS)
+	@./tools/fontgen
 
 pisound: $(OBJS)
 	@echo [link]
@@ -47,5 +52,6 @@ clean:
 	rm -rf src/*.o
 	rm -rf tools/*.o
 	rm -f pisound
-	rm -f listdir
+	rm -f tools/listdir
+	rm -f tools/fontgen
 
