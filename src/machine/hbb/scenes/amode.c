@@ -47,12 +47,12 @@ static void create_scroller_texture (void)
 static void draw_scroller (void)
 {
     SDL_RenderCopy (renderer, scroller, NULL, &scrlrect);
-    scrlrect.x--;
+    scrlrect.x -= 2;
     //scrlrect.x goes minus, innit, so when it hits 0, wrap to the next line
     if (scrlrect.w + scrlrect.x <= 0)
     {
         line++;
-        if (line > 4)
+        if (line > 3)
             line = 0;
         create_scroller_texture ();
     }
