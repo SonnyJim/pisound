@@ -26,7 +26,7 @@ static int init_game_scene (void)
     if (background_srf == NULL)
     {
         fprintf (stderr, "Error loading background: %s\n", SDL_GetError());
-        return 0;
+        return 1;
     }
     
     background_tex = SDL_CreateTextureFromSurface(renderer, background_srf);
@@ -34,12 +34,12 @@ static int init_game_scene (void)
     if (background_tex == NULL)
     {
         fprintf (stderr, "Error creating background texture: %s\n", SDL_GetError());
-        return 0;
+        return 1;
     }
     SDL_FreeSurface (background_srf);
     
     running_scene = current_scene;
-    return 1;
+    return 0;
 }
 
 static void render_score (void)

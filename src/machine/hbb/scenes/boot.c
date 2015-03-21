@@ -17,7 +17,7 @@ static int init_boot_scene (void)
     if (surface == NULL)
     {
         fprintf (stderr, "Error loading hbb_logo.png %s\n", SDL_GetError ());
-        return 0;
+        return 1;
     }
 
     texture = SDL_CreateTextureFromSurface (renderer, surface);
@@ -25,7 +25,7 @@ static int init_boot_scene (void)
     if (texture == NULL)
     {
         fprintf (stderr, "Error creating texture from surface\n");
-        return 0;
+        return 1;
     }
     
     SDL_QueryTexture (texture, NULL, NULL, &dstrect.w, &dstrect.h);
@@ -34,7 +34,7 @@ static int init_boot_scene (void)
     dstrect.y = (SCREEN_HEIGHT / 2) - (dstrect.h / 2);
  
     running_scene = current_scene;
-    return 1;
+    return 0;
 }
 
 int draw_boot (void)

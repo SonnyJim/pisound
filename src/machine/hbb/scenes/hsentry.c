@@ -27,6 +27,6 @@ int draw_hsentry (void)
         init_hsentry_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
-    return 1;
+    return 0;
 }
 

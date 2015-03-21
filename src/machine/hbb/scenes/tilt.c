@@ -54,6 +54,6 @@ int draw_tilt (void)
         zoom = 0;
 
     SDL_RenderCopy (renderer, texture, NULL, &zoom_rect); 
-    return 1;
+    return 0;
 }
 

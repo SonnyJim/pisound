@@ -27,6 +27,6 @@ int draw_test (void)
         init_test_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
-    return 1;
+    return 0;
 }
 

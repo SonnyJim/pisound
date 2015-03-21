@@ -27,6 +27,6 @@ int draw_gameover (void)
         init_gameover_scene ();
 
     SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
-    return 1;
+    return 0;
 }
 
