@@ -21,7 +21,7 @@ static void udp_scene_receive (long scene)
     if (scene >= 0 && scene <= MAX_SCENES)
     {
         if (verbose)
-            fprintf (stdout, "scene change requested: %s\n", scene_names[scene]);
+            fprintf (stdout, "scene change requested: %lu\n", scene);
         current_scene = (int) scene;
     }
     else
@@ -59,23 +59,23 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
     //Error checking
     if (strlen (msg) < 1)
     {
-        fprintf (stderr, "Error in udp_decode_msg: empty message");
+        fprintf (stderr, "Error in udp_decode_msg: tiny message");
         udp_send_msg (UDP_MSG_ERROR, cliaddr);
         return;
     }
     else if (strlen (msg) < 4 
             && (byte1 != UDP_SOUND_PLAY || byte1 != UDP_MUSIC_PLAY || byte1 == UDP_SCENE_CHANGE))
     {
-        fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
-        fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
-        udp_send_msg (UDP_MSG_ERROR, cliaddr);
+        //fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
+        //fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
+        //udp_send_msg (UDP_MSG_ERROR, cliaddr);
         //return;
     }
 
     if (byte1 > 255 || byte2 > 255)
     {
-        udp_send_msg (UDP_MSG_ERROR, cliaddr);
-        fprintf (stderr, "Error in udp_decode_msg: %i %i %s\n", byte1, byte2, msg);
+        //udp_send_msg (UDP_MSG_ERROR, cliaddr);
+        fprintf (stderr, "Error in udp_decode_msg bytes bigger than 255: %i %i %s\n", byte1, byte2, msg);
     }
 
     if (verbose)
