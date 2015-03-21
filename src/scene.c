@@ -1,3 +1,4 @@
+#include "pisound.h"
 #include "scene.h"
 
 const char *scene_names[] = {
