@@ -49,9 +49,10 @@ pisound: $(OBJS)
 	@$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 clean:
-	rm -rf src/*.o
-	rm -rf tools/*.o
-	rm -f pisound
-	rm -f tools/listdir
-	rm -f tools/fontgen
+	@echo "[Removing object files]"
+	@find . -name '*.o' -delete
+	@echo "[Removing binaries]"
+	@rm -f pisound
+	@rm -f tools/listdir
+	@rm -f tools/fontgen
 

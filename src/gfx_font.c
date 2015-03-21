@@ -4,19 +4,20 @@ int load_fonts (void)
 {
     int i, len, fontsize;
     FILE *cfg_file;
-    char cfg_line[1024], *filename;
+    char cfg_line[1024], *filename, *fontname;
     const char delim[] = ",";
 
     if (TTF_Init () != 0)
     {
         fprintf (stderr, "Error initialising SDL_ttf %s\n", TTF_GetError());
+        return 1;
     }
 
     //Initiliase font array
     for (i = 0; i < MAX_FONTS; i++)
         fonts[i] = NULL;
 
-    //Load font
+    //Load font list
     if (verbose)
         fprintf (stdout, "Attempting to load font list %s\n", CFG_FONT_FILE);
     cfg_file = fopen (CFG_FONT_FILE, "r");
@@ -36,11 +37,12 @@ int load_fonts (void)
             if (cfg_line[len - 1] == '\n')
                 cfg_line[len - 1] = '\0';
 
-            fontsize = atoi (strtok (cfg_line, delim));
+            fontname = strtok (cfg_line, delim);
+            fontsize = atoi (strtok (NULL, delim));
             filename = strtok (NULL, delim);
           
             if (verbose)
-                fprintf (stdout, "Loading %s | position %i | size %i\n", filename, i, fontsize);
+                fprintf (stdout, "Loading %s from %s | position %i | size %i\n", fontname, filename, i, fontsize);
             
             fonts[i] = TTF_OpenFont(filename, fontsize);
             if (fonts[i] == NULL)
