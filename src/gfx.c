@@ -40,10 +40,10 @@ void show_pisound_logo (void)
 
     SDL_Texture *bootlogo_tex = NULL;
 
-    SDL_Texture *frog_tex = load_image_to_texture ("images/frog.png");
+    SDL_Texture *frog_tex = load_image_to_texture ("data/gfx/frog.png");
     SDL_Rect    frog_srcrect;
     SDL_Rect    frog_dstrect;
-    bootlogo_tex = load_image_to_texture ("images/pisound_logo.png");
+    bootlogo_tex = load_image_to_texture ("data/gfx/pisound_logo.png");
 
     frog_dstrect.x = SCREEN_WIDTH - FROG_SIZE;
     frog_dstrect.y = (SCREEN_HEIGHT / 2) + 130;
