@@ -1,11 +1,11 @@
 GAME = hbb
 #BUILD_GPIO = y
-#BUILD_GFX = y
+BUILD_GFX = y
 CC	= gcc
 SDL2_CFLAGS := $(shell sdl2-config --cflags)
 SDL2_LDFLAGS := $(shell sdl2-config --libs)
 CFLAGS = -O3 -Wall -Winline -pipe -std=gnu99 $(SDL2_CFLAGS) -I./src/include
-LDLIBS = -lpthread -lSDL2_mixer $(SDL2_LDFLAGS)
+LDLIBS = -lpthread -lSDL2_mixer $(SDL2_LDFLAGS) -lm
 
 OBJS = src/pisound.o src/getopts.o src/queue.o src/cfg.o src/udp.o src/volume.o src/pidfile.o src/snd.o
 #HDRS = src/pisound.h src/scene.h src/volume.h src/queue.h src/udp.h src/cfg.h
@@ -36,7 +36,7 @@ endif
 
 
 debug: CFLAGS += -g
-debug: pisound
+debug: clean all
 
 OBJS += $(HDRS)
 
@@ -45,7 +45,7 @@ listdir: tools/listdir.o
 	@$(CC) -o tools/$@ $^ $(LDFLAGS) $(LDLIBS)
 
 fontgen: tools/fontgen.o
-	@echo [Compiling fontgen]
+	@echo [Linking fontgen]
 	@$(CC) -o tools/$@ $^ $(LDFLAGS) $(LDLIBS)
 	@./tools/fontgen
 

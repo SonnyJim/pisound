@@ -3,6 +3,7 @@
 #include "scene.h"
 
 SDL_Texture * texture;
+SDL_Rect srcrect;
 SDL_Rect dstrect;
 
 SDL_Texture *scroller;
@@ -46,7 +47,6 @@ static void create_scroller_texture (void)
 
 static void draw_scroller (void)
 {
-    SDL_RenderCopy (renderer, scroller, NULL, &scrlrect);
     scrlrect.x -= 2;
     //scrlrect.x goes minus, innit, so when it hits 0, wrap to the next line
     if (scrlrect.w + scrlrect.x <= 0)
@@ -65,8 +65,12 @@ int draw_amode (void)
         init_amode_scene ();
         create_scroller_texture ();
     }
-    SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    //SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    scene_render_texture (texture, dstrect); 
+    
     draw_scroller ();
+    //SDL_RenderCopy (renderer, scroller, NULL, &scrlrect);
+    scene_render_texture (scroller, scrlrect); 
 
     return 0;
 }

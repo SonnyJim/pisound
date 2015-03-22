@@ -31,6 +31,18 @@ SDL_Texture* load_image_to_texture (char *filename)
     return dst_texture;
 }
 
+//Setup the transition textures
+void init_trans_textures (void)
+{
+    trans_scene1 = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+    trans_scene2 = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+    trans_scenefinal = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+    if (trans_scene1 == 0 || trans_scene2 == 0 || trans_scenefinal == 0)
+    {
+        fprintf (stderr, "Error setting up trans_textures: %s\n", SDL_GetError());
+        running = 0;
+    }
+}
 
 void show_pisound_logo (void)
 {
@@ -146,12 +158,12 @@ int init_screen (void)
         }
     }
    
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC |  SDL_RENDERER_TARGETTEXTURE);
     
     if (renderer == NULL)
     {
         fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE |  SDL_RENDERER_TARGETTEXTURE);
         if (renderer == NULL)
         {
             fprintf (stderr, "Error creating software renderer: %s\n", SDL_GetError());
@@ -201,7 +213,7 @@ void* gfx_thread (void *ptr)
         fpsFrames = 0;
         fpsStart = SDL_GetTicks ();
     }
-
+    init_trans_textures ();
     gfx_init_game_vars ();
     while (running)
     {

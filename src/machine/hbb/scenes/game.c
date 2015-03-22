@@ -38,6 +38,10 @@ static int init_game_scene (void)
     }
     SDL_FreeSurface (background_srf);
     
+    //SDL_QueryTexture (background_tex, NULL, NULL, &background_rect.w, &background_rect.h);
+    background_rect.w = SCREEN_WIDTH;
+    background_rect.h = SCREEN_HEIGHT;
+    
     running_scene = current_scene;
     return 0;
 }
@@ -64,7 +68,7 @@ static void render_score (void)
         
         //Inner text
         textColor = (SDL_Color) { 82, 42, 0};
-        score_srf = TTF_RenderText_Solid( fonts[0], score_string, textColor );
+        score_srf = TTF_RenderText_Solid ( FON_CHIZ_BOLD_80, score_string, textColor );
         score_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
         SDL_FreeSurface (score_srf);
         SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
@@ -72,7 +76,7 @@ static void render_score (void)
         
         //Outline
         textColor = (SDL_Color) { 42, 22, 0};
-        score_srf = TTF_RenderText_Solid( fonts[1], score_string, textColor );
+        score_srf = TTF_RenderText_Blended( FON_CHIZ_BOLD_OUTLINE_80, score_string, textColor );
         score_outline_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
         SDL_FreeSurface (score_srf);
         SDL_SetTextureBlendMode (score_outline_tex, SDL_BLENDMODE_BLEND);    
@@ -80,9 +84,11 @@ static void render_score (void)
         
         old_score = score;
     }
-    SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
-    SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
-   
+    //SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
+    scene_render_texture (score_tex, score_rect);
+    //SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
+    scene_render_texture (score_outline_tex, score_rect);
+
     //Render player number
     if (player_num != old_player_num)
     {
@@ -98,14 +104,15 @@ static void render_score (void)
         player_rect.h = textHeight;
         
         textColor = (SDL_Color) { 0, 0, 0};
-        score_srf = TTF_RenderText_Solid( fonts[2], score_string, textColor );
+        score_srf = TTF_RenderText_Blended ( FON_CHIZ_BOLD_40, score_string, textColor );
         player_tex = SDL_CreateTextureFromSurface(renderer, score_srf);
         SDL_FreeSurface (score_srf);
         SDL_SetTextureBlendMode (score_tex, SDL_BLENDMODE_BLEND);    
         SDL_SetTextureAlphaMod (score_tex, 200);
         old_player_num = player_num;
     }
-    SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
+    //SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
+    scene_render_texture (player_tex, player_rect);
 }
 
 /*
@@ -141,7 +148,8 @@ int draw_game (void)
         ret = init_game_scene ();
 
    
-    SDL_RenderCopy (renderer, background_tex, NULL, NULL);
+    //SDL_RenderCopy (renderer, background_tex, NULL, NULL);
+    scene_render_texture (background_tex, background_rect);
     render_score ();
     return ret;
 }

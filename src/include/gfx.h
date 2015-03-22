@@ -16,6 +16,11 @@ SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_RendererInfo drinfo; 
 
+//3 Scenes for the transition effect
+SDL_Texture *trans_scene1;
+SDL_Texture *trans_scene2;
+SDL_Texture *trans_scenefinal;
+
 int SCREEN_HEIGHT;
 int SCREEN_WIDTH;
 int SCREEN_BPP;

@@ -11,7 +11,7 @@ static void init_gameover_scene (void)
         fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
 
     SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface = TTF_RenderText_Solid ( fonts[0], scene_names[current_scene], color);
+    SDL_Surface * surface = TTF_RenderText_Blended ( FON_CHIZ_BOLD_80, scene_names[current_scene], color);
     texture = SDL_CreateTextureFromSurface (renderer, surface);
     SDL_FreeSurface (surface);
     SDL_QueryTexture (texture, NULL, NULL, &dstrect.w, &dstrect.h);
@@ -26,7 +26,8 @@ int draw_gameover (void)
     if (current_scene != running_scene)
         init_gameover_scene ();
 
-    SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    //SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    scene_render_texture (texture, dstrect);
     return 0;
 }
 

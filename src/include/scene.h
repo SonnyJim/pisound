@@ -1,4 +1,4 @@
-#define MAX_SCENES 6
+#define MAX_SCENES 8
 
 int current_scene, running_scene, current_subscene, running_subscene;
 
@@ -11,6 +11,7 @@ int draw_gameover (void);
 int draw_hsentry (void);
 int draw_test (void);
 int draw_tilt (void);
+void scene_render_texture (SDL_Texture *texture, SDL_Rect dstrect);
 
 extern const char *scene_names[];
 enum scenes {
@@ -23,6 +24,9 @@ enum scenes {
     TILT,
     INVALID_SCENE
 };
+
+
+int scene_transition;
 
 enum game_subscenes {
     GAME_SIGN,

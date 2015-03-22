@@ -43,7 +43,8 @@ int draw_boot (void)
     if (current_scene != running_scene)
         ret = init_boot_scene ();
 
-    SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    //SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    scene_render_texture (texture, dstrect);
     return ret;
 }
 
