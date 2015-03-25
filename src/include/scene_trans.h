@@ -1,17 +1,15 @@
-#define NUM_TRANS_FX 2
+#define NUM_TRANS_FX 10
 
-SDL_Rect transrect;
+SDL_Rect trans_rect1;
+SDL_Rect trans_rect2;
+int trans_alpha;
+int trans_var1;
+
 struct trans_ops 
 {
     void (*init) (void);
     void (*run) (void);
 };
-
-void trans_hor_wipe_init (void);
-void trans_hor_wipe_run (void);
-
-void trans_ver_wipe_init (void);
-void trans_ver_wipe_run (void);
 
 enum trans_fx {
     TRANS_HOR_WIPE,

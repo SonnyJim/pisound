@@ -4,7 +4,7 @@
 #include "scene.h"
 
 int txtW, txtH;
-SDL_Texture * texture;
+SDL_Texture * boot_tex;
 SDL_Rect dstrect;
 
 static int init_boot_scene (void)
@@ -20,15 +20,15 @@ static int init_boot_scene (void)
         return 1;
     }
 
-    texture = SDL_CreateTextureFromSurface (renderer, surface);
+    boot_tex = SDL_CreateTextureFromSurface (renderer, surface);
     SDL_FreeSurface (surface);
-    if (texture == NULL)
+    if (boot_tex == NULL)
     {
-        fprintf (stderr, "Error creating texture from surface\n");
+        fprintf (stderr, "Error creating boot_tex from surface\n");
         return 1;
     }
     
-    SDL_QueryTexture (texture, NULL, NULL, &dstrect.w, &dstrect.h);
+    SDL_QueryTexture (boot_tex, NULL, NULL, &dstrect.w, &dstrect.h);
 
     dstrect.x = (SCREEN_WIDTH / 2) - (dstrect.w / 2);
     dstrect.y = (SCREEN_HEIGHT / 2) - (dstrect.h / 2);
@@ -42,7 +42,7 @@ int draw_boot (void)
     if (requested_scene != running_scene)
         ret = init_boot_scene ();
 
-    SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
+    SDL_RenderCopy (renderer, boot_tex, NULL, &dstrect); 
     return ret;
 }
 

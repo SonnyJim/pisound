@@ -42,7 +42,6 @@ static int init_game_scene (void)
     background_rect.w = SCREEN_WIDTH;
     background_rect.h = SCREEN_HEIGHT;
     
-    running_scene = requested_scene;
     return 0;
 }
 

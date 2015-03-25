@@ -43,10 +43,12 @@ static void scene_render_transition (void)
 int scene_draw (void)
 {
     int ret = 0;
+   
+
+    SDL_RenderClear (renderer);
     //If no transition, just draw the current scene
-    if (scene_transition == 0)
+    if (!scene_transition && !scene_transition_running && running_scene != requested_scene)
     {
-        SDL_RenderClear (renderer);
         ret = (*scene_p[requested_scene]) ();
         running_scene = requested_scene;
     }
@@ -73,42 +75,14 @@ int scene_draw (void)
         //Set the render target back to default
         SDL_SetRenderTarget (renderer, NULL);
         scene_transition_running = 1;
-    }
-    
-    if (scene_transition_running)
-    {
         scene_render_transition ();
     }
+    else if (scene_transition_running)
+        scene_render_transition ();
+    else
+        ret = (*scene_p[running_scene]) ();
+    
 
-    /*
-    switch (requested_scene)
-    {
-            case BOOT:
-                ret = draw_boot ();
-                break;
-            case AMODE:
-                ret = draw_amode ();
-                break;
-            case GAME:
-                ret = draw_game ();
-                break;
-            case GAMEOVER:
-                ret = draw_gameover ();
-                break;
-            case HSENTRY:
-                ret = draw_hsentry ();
-                break;
-            case TEST:
-                ret = draw_test ();
-                break;
-            case TILT:
-                ret = draw_tilt ();
-                break;
-            default:
-                ret = draw_amode ();
-                break;
-    }
-    */
     SDL_RenderPresent (renderer);
     return ret;
 }

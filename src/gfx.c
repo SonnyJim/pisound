@@ -214,6 +214,8 @@ void* gfx_thread (void *ptr)
     }
     init_trans_textures ();
     gfx_init_game_vars ();
+    requested_scene = BOOT;
+    running_scene = INVALID_SCENE;
     while (running)
     {
         if (scene_draw ())
