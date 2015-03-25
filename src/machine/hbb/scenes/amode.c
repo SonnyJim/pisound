@@ -18,17 +18,16 @@ const char *scroller_text[4] = {"This is a really long piece of text to demonstr
 static void init_amode_scene (void)
 {
     if (verbose)
-        fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
+        fprintf (stdout, "Initialising %s scene\n", scene_names[requested_scene]);
 
     SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface = TTF_RenderText_Blended ( FON_CHIZ_BOLD_80, scene_names[current_scene], color);
+    SDL_Surface * surface = TTF_RenderText_Blended ( FON_CHIZ_BOLD_80, "Attract Mode", color);
     texture = SDL_CreateTextureFromSurface (renderer, surface);
     SDL_FreeSurface (surface);
     SDL_QueryTexture (texture, NULL, NULL, &dstrect.w, &dstrect.h);
     dstrect.x = (SCREEN_WIDTH / 2) - (dstrect.w / 2);
     dstrect.y = (SCREEN_HEIGHT / 2) - (dstrect.h / 2);
  
-    running_scene = current_scene;
 }
 
 static void create_scroller_texture (void)
@@ -60,17 +59,15 @@ static void draw_scroller (void)
 
 int draw_amode (void)
 {
-    if (current_scene != running_scene)
+    if (requested_scene != running_scene)
     {
         init_amode_scene ();
         create_scroller_texture ();
     }
-    //SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
-    scene_render_texture (texture, dstrect); 
+    SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
     
     draw_scroller ();
-    //SDL_RenderCopy (renderer, scroller, NULL, &scrlrect);
-    scene_render_texture (scroller, scrlrect); 
+    SDL_RenderCopy (renderer, scroller, NULL, &scrlrect);
 
     return 0;
 }

@@ -36,8 +36,7 @@ void init_trans_textures (void)
 {
     trans_scene1 = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
     trans_scene2 = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
-    trans_scenefinal = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
-    if (trans_scene1 == 0 || trans_scene2 == 0 || trans_scenefinal == 0)
+    if (trans_scene1 == NULL || trans_scene2 == NULL)
     {
         fprintf (stderr, "Error setting up trans_textures: %s\n", SDL_GetError());
         running = 0;
@@ -158,7 +157,7 @@ int init_screen (void)
         }
     }
    
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC |  SDL_RENDERER_TARGETTEXTURE);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
     
     if (renderer == NULL)
     {
@@ -217,13 +216,11 @@ void* gfx_thread (void *ptr)
     gfx_init_game_vars ();
     while (running)
     {
-        SDL_RenderClear(renderer);
         if (scene_draw ())
         {
             fprintf (stderr, "Error in scene_draw()\n");
             running = 0;
         }
-        SDL_RenderPresent (renderer);
         
         if (cfg_show_fps)
         {

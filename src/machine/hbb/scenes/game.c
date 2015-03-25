@@ -19,7 +19,7 @@ void game_sign_init (void)
 static int init_game_scene (void)
 {
     if (verbose)
-        fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
+        fprintf (stdout, "Initialising %s scene\n", scene_names[requested_scene]);
     
     
     background_srf = IMG_Load ("data/hbb/gfx/backgrounds/sign.png");
@@ -42,7 +42,7 @@ static int init_game_scene (void)
     background_rect.w = SCREEN_WIDTH;
     background_rect.h = SCREEN_HEIGHT;
     
-    running_scene = current_scene;
+    running_scene = requested_scene;
     return 0;
 }
 
@@ -84,10 +84,8 @@ static void render_score (void)
         
         old_score = score;
     }
-    //SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
-    scene_render_texture (score_tex, score_rect);
-    //SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
-    scene_render_texture (score_outline_tex, score_rect);
+    SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
+    SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
 
     //Render player number
     if (player_num != old_player_num)
@@ -111,8 +109,7 @@ static void render_score (void)
         SDL_SetTextureAlphaMod (score_tex, 200);
         old_player_num = player_num;
     }
-    //SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
-    scene_render_texture (player_tex, player_rect);
+    SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
 }
 
 /*
@@ -144,12 +141,11 @@ void load_gfx (void)
 int draw_game (void)
 {
     int ret = 0;
-    if (current_scene != running_scene)
+    if (requested_scene != running_scene)
         ret = init_game_scene ();
 
    
-    //SDL_RenderCopy (renderer, background_tex, NULL, NULL);
-    scene_render_texture (background_tex, background_rect);
+    SDL_RenderCopy (renderer, background_tex, NULL, NULL);
     render_score ();
     return ret;
 }

@@ -17,10 +17,10 @@ float angle_stepsize = 0.3;
 static int init_tilt_scene (void)
 {
     if (verbose)
-        fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
+        fprintf (stdout, "Initialising %s scene\n", scene_names[requested_scene]);
 
     SDL_Color color = { 255, 0, 0 };
-    SDL_Surface * surface = TTF_RenderText_Blended ( FON_CHIZ_BOLD_80, scene_names[current_scene], color);
+    SDL_Surface * surface = TTF_RenderText_Blended ( FON_CHIZ_BOLD_80, "TILT", color);
     texture = SDL_CreateTextureFromSurface (renderer, surface);
     if (texture == NULL)
     {
@@ -35,7 +35,7 @@ static int init_tilt_scene (void)
     scale = 0;
     zoom = 1;
 
-    running_scene = current_scene;
+    running_scene = requested_scene;
     return 0;
 }
 
@@ -108,7 +108,7 @@ static void draw_tilt_zoom (void)
 
 int draw_tilt (void)
 {
-    if (current_scene != running_scene)
+    if (requested_scene != running_scene)
     {
         init_tilt_scene ();
         init_draw_circle ();
@@ -117,10 +117,8 @@ int draw_tilt (void)
     draw_tilt_zoom ();
     draw_circle ();
 
-    //SDL_RenderCopy (renderer, texture, NULL, &zoom_rect); 
-    //SDL_RenderCopy (renderer, circle_tex, NULL, &circle_rect); 
-    scene_render_texture (texture, zoom_rect);
-    scene_render_texture (circle_tex, circle_rect);
+    SDL_RenderCopy (renderer, texture, NULL, &zoom_rect); 
+    SDL_RenderCopy (renderer, circle_tex, NULL, &circle_rect); 
     return 0;
 }
 

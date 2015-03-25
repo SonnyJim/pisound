@@ -22,13 +22,21 @@ static void udp_scene_receive (long scene)
     {
         if (verbose)
             fprintf (stdout, "scene change requested: %lu\n", scene);
-        current_scene = (int) scene;
+        requested_scene = (int) scene;
     }
     else
     {
         fprintf (stderr, "Error: requested scene %lu out of range\n", scene);
         udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
+}
+
+static void udp_scene_trans (long trans)
+{
+    if (verbose)
+        fprintf (stdout, "transition requested: %lu\n", trans);
+    if (!scene_transition_running)
+        scene_transition = (int) trans;
 }
 
 static void udp_player_num (long num)
@@ -118,6 +126,9 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
             break;
         case UDP_SCENE_CHANGE:
             udp_scene_receive (byte2);
+            break;
+        case UDP_SCENE_TRANS:
+            udp_scene_trans (byte2);
             break;
         default:
             fprintf (stderr, "Unrecognised udp_decode_msg: %i %i %s\n", byte1, byte2, msg);

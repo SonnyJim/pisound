@@ -10,7 +10,7 @@ SDL_Rect dstrect;
 static int init_boot_scene (void)
 {
     if (verbose)
-        fprintf (stdout, "Initialising %s scene\n", scene_names[current_scene]);
+        fprintf (stdout, "Initialising %s scene\n", scene_names[requested_scene]);
     
     SDL_Surface * surface = IMG_Load ("data/hbb/gfx/hbb_logo.png");
     
@@ -33,18 +33,16 @@ static int init_boot_scene (void)
     dstrect.x = (SCREEN_WIDTH / 2) - (dstrect.w / 2);
     dstrect.y = (SCREEN_HEIGHT / 2) - (dstrect.h / 2);
  
-    running_scene = current_scene;
     return 0;
 }
 
 int draw_boot (void)
 {
     int ret = 0;
-    if (current_scene != running_scene)
+    if (requested_scene != running_scene)
         ret = init_boot_scene ();
 
-    //SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
-    scene_render_texture (texture, dstrect);
+    SDL_RenderCopy (renderer, texture, NULL, &dstrect); 
     return ret;
 }
 

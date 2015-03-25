@@ -20,7 +20,7 @@ endif
 ifdef BUILD_GFX
 CFLAGS += -DBUILD_GFX
 LDLIBS += -lSDL2_ttf -lSDL2_image
-OBJS += src/gfx.o src/gfx_font.o src/scenes/test.o src/scene.o
+OBJS += src/gfx.o src/gfx_font.o src/scenes/test.o src/scene.o src/scene_trans.o
 ifeq ($(GAME), hbb)
 OBJS += src/machine/hbb/scenes/amode.o src/machine/hbb/scenes/game.o 
 OBJS += src/machine/hbb/scenes/gameover.o src/machine/hbb/scenes/hsentry.o src/machine/hbb/scenes/tilt.o src/machine/hbb/scenes/boot.o
