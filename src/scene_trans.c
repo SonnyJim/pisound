@@ -271,6 +271,86 @@ void trans_blinds_run (void)
     }
 }
 
+void trans_centre_door_init (void)
+{
+    trans_rect1.x = (SCREEN_WIDTH / 2) - 1;
+    trans_rect1.y = 0;
+    trans_rect1.w = 1;
+    trans_rect1.h = SCREEN_HEIGHT;
+}
+
+#define STEPSIZE 5
+void trans_centre_door_run (void)
+{
+    SDL_RenderClear (renderer);
+    SDL_RenderCopy (renderer, trans_scene1, NULL, NULL);
+    SDL_RenderCopy (renderer, trans_scene2, &trans_rect1, &trans_rect1);
+
+    trans_rect1.x -= STEPSIZE;
+    trans_rect1.w += 2 * STEPSIZE;
+    if (trans_rect1.x <= 0)
+    {
+        if (verbose)
+            fprintf (stdout, "scene_draw: trans_centre_door finished\n");
+        scene_transition = 0;
+        scene_transition_running = 0;
+    }
+}
+
+#define NUM_SLITS 32
+#define SLIT_HEIGHT (SCREEN_HEIGHT / NUM_SLITS)
+#define SLIT_STEP trans_var1
+#define SLIT_STEPSIZE trans_var2
+void trans_slits_init (void)
+{
+    trans_rect1.x = 0;
+    trans_rect1.w = 1;
+    trans_rect1.h = SLIT_HEIGHT;
+
+    trans_rect2.x = 0;
+    trans_rect2.w = 1;
+    trans_rect2.h = SLIT_HEIGHT; 
+
+    SLIT_STEP = 1;
+    SLIT_STEPSIZE = 10;
+}
+
+void trans_slits_run (void)
+{
+    int i;
+    SDL_RenderClear (renderer);
+    SDL_RenderCopy (renderer, trans_scene1, NULL, NULL);
+
+    trans_rect1.y = 0;
+    trans_rect2.y = 0;
+    for (i = 0; i < NUM_SLITS; i++)
+    {
+        if (i % 2 != 0)
+        {
+            SDL_RenderCopy (renderer, trans_scene2, &trans_rect1, &trans_rect1);
+        }
+        else
+        {
+            trans_rect2.x = SCREEN_WIDTH - SLIT_STEP;
+            SDL_RenderCopy (renderer, trans_scene2, &trans_rect2, &trans_rect2);
+        }
+        trans_rect1.y += SLIT_HEIGHT;
+        trans_rect2.y += SLIT_HEIGHT;
+    }
+    SLIT_STEP += SLIT_STEPSIZE;
+    trans_rect1.w = SLIT_STEP;
+    trans_rect2.w = SLIT_STEP;
+
+    if (SLIT_STEP >= SCREEN_WIDTH)
+    {
+        if (verbose)
+            fprintf (stdout, "scene_draw: trans_slits finished\n");
+        scene_transition = 0;
+        scene_transition_running = 0;
+    }
+
+}
+
 struct trans_ops trans_effects[] = { 
     { .init = trans_hor_wipe1_init, .run = trans_hor_wipe1_run},
     { .init = trans_hor_wipe2_init, .run = trans_hor_wipe2_run},
@@ -280,6 +360,8 @@ struct trans_ops trans_effects[] = {
     { .init = trans_vert_wipe3_init, .run = trans_vert_wipe3_run},
     { .init = trans_zoom_init, .run = trans_zoom_run},
     { .init = trans_blinds_init, .run = trans_blinds_run},
+    { .init = trans_centre_door_init, .run = trans_centre_door_run},
+    { .init = trans_slits_init, .run = trans_slits_run},
     { .init = trans_fade_init, .run = trans_fade_run}
 };
 
