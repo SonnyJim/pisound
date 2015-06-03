@@ -29,12 +29,13 @@ int getopts (int argc, char *argv[])
     cfg_show_fps = 0;
     cfg_show_logo = 1;
 
+    /*
     if (argv[1][0] != '-')
     {
         fprintf (stderr, "Unrecognised option: %s\n", argv[1]);
         return 1;
     }
-
+*/
     while ((c = getopt (argc, argv, "vhgaGufl")) != -1)
     {
         switch (c)
