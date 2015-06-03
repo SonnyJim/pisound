@@ -4,9 +4,16 @@
 #include "gfx.h"
 #include "scene.h"
 
-static void udp_send_msg (char *msg, IPaddress *cliaddr)
+static void udp_send_msg (char *msg, Uint32 cliaddr)
 {
-    
+    Uint16 port = UDP_PORT + 1; 
+    strcpy ((char *)pms->data, msg);
+    pms->len = strlen ((char *)pms->data);
+    pms->address.host = cliaddr;
+    pms->address.port = SDLNet_Read16(&port);
+    if (verbose)
+        fprintf (stdout, "Sending msg: %s to %x %x\n", pms->data, pms->address.host, pms->address.port); 
+    SDLNet_UDP_Send(sd, -1, pms);
 }
 
 static void udp_score_receive (char *msg)
@@ -15,7 +22,7 @@ static void udp_score_receive (char *msg)
     fprintf (stdout, "Score set to %lld\n", score);
 }
 
-static void udp_scene_receive (long scene)
+static void udp_scene_receive (long scene, Uint32 cliaddr)
 {
     if (scene >= 0 && scene <= MAX_SCENES)
     {
@@ -26,7 +33,7 @@ static void udp_scene_receive (long scene)
     else
     {
         fprintf (stderr, "Error: requested scene %lu out of range\n", scene);
-    //    udp_send_msg (UDP_MSG_ERROR, cliaddr);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
 }
 
@@ -38,7 +45,7 @@ static void udp_scene_trans (long trans)
         scene_transition = (int) trans;
 }
 
-static void udp_player_num (long num)
+static void udp_player_num (long num, Uint32 cliaddr)
 {
     if (num > 0 && num <= MAX_PLAYERS)
     {
@@ -47,11 +54,11 @@ static void udp_player_num (long num)
     else
     {
         fprintf (stderr, "Error: udp_player_num out of range\n");
-//        udp_send_msg (UDP_MSG_ERROR, cliaddr);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
 }
 
-static void udp_decode_msg (char *msg, IPaddress *cliaddr)
+static void udp_decode_msg (char *msg, Uint32 cliaddr)
 {
     int byte1, byte2;
     char cmd[3], code[3];
@@ -118,13 +125,13 @@ static void udp_decode_msg (char *msg, IPaddress *cliaddr)
             udp_score_receive (msg);
             break;
         case UDP_PLAYER_NUM:
-            udp_player_num (byte2);
+            udp_player_num (byte2, cliaddr);
             break;
         case UDP_SHUTDOWN:
             running = 0;
             break;
         case UDP_SCENE_CHANGE:
-            udp_scene_receive (byte2);
+            udp_scene_receive (byte2, cliaddr);
             break;
         case UDP_SCENE_TRANS:
             udp_scene_trans (byte2);
@@ -145,6 +152,11 @@ void* udp_thread (void *ptr)
         return NULL;
     }
 
+    if (!(sds = SDLNet_UDP_Open(0)))
+    {
+        fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
+        return NULL;
+    }
     /* Make space for the packet */
     if (!(pm = SDLNet_AllocPacket(UDP_BUFFLEN)))
     {
@@ -162,12 +174,13 @@ void* udp_thread (void *ptr)
     {
         if (SDLNet_UDP_Recv(sd, pm))
         {
-            udp_decode_msg ((char *)pm->data, (IPaddress *)pm->address.host);
+            udp_decode_msg ((char *)pm->data, pm->address.host);
         }
     }
     
     if (verbose)
         fprintf (stdout, "Shutting down udp server\n");
     SDLNet_FreePacket(pm);
+    SDLNet_FreePacket(pms);
     return NULL;
 }

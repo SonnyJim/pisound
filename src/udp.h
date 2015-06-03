@@ -38,9 +38,3 @@ UDPsocket sd; //Socket descriptor
 UDPpacket *pm; //Packet memory ptr
 UDPpacket *pms; //Packet memory send ptr
 IPaddress cliaddr;
-/*
-int sockfd,n;
-struct sockaddr_in servaddr,cliaddr;
-socklen_t len;
-*/
-char mesg[UDP_BUFFLEN];

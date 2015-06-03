@@ -5,6 +5,7 @@ import tty, termios
 #IP = "127.0.0.1"
 IP = "192.168.1.80"
 PORT = 8008
+RPORT = 8009
 RECV_BUFFSIZE = 1024
 running = 0
 message = ""
@@ -27,8 +28,9 @@ def getch ():
 #Thread to receive the UDP responses
 def recv_thread ():
     global running
+    sockr.bind ((IP, RPORT))
     while running:
-        recv_data = sock.recvfrom(RECV_BUFFSIZE)
+        recv_data = sockr.recvfrom(RECV_BUFFSIZE)
         print "\nReceived: ", recv_data[0], "\n"
 
 #Thread to send the UDP messages
@@ -93,6 +95,7 @@ def send_thread ():
 
 running = 1
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sockr = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 print "Simple UDP test client"
 print "======================"
 print "\n+/- Volume up/down"
