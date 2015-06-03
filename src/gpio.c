@@ -129,7 +129,7 @@ void gpio_send_out (int val)
     queue_add (&gpio_output_q, val);
 }
 
-void *gpio_thread(void *ptr)
+int *gpio_thread(void *ptr)
 {
     init_gpio ();
     while (running)
@@ -145,7 +145,7 @@ void *gpio_thread(void *ptr)
     digitalWrite (STATUS_LED, 0);
     if (verbose)
         fprintf (stdout, "GPIO thread stopped\n");
-    return NULL;
+    return 0;
 }
 
 

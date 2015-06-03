@@ -182,7 +182,7 @@ int load_gfx_resources (void)
     return 0;
 }
 
-void* gfx_thread (void *ptr)
+int gfx_thread (void *ptr)
 {
     int font_num;
 
@@ -193,7 +193,7 @@ void* gfx_thread (void *ptr)
     {
         fprintf (stderr, "Error setting up screen\n");
         running = 0;
-        return NULL;
+        return 1;
     }
 
     //show logo also loads resources
@@ -243,5 +243,5 @@ void* gfx_thread (void *ptr)
     if (verbose)
        fprintf (stdout, "GFX thread stopped\n");
 
-    return NULL;
+    return 0;
 }

@@ -2,6 +2,11 @@
 #include "queue.h"
 #include "scene.h"
 
+SDL_Thread *thread1 = NULL; // GPIO
+SDL_Thread *thread2 = NULL; // UDP
+SDL_Thread *thread3 = NULL; // GFX
+SDL_Thread *thread4 = NULL; // SND
+
 static void shutdown_pisound (void)
 {
         free_sounds ();
@@ -12,7 +17,8 @@ static void shutdown_pisound (void)
 
 void sig_handler (int signo)
 {
-    int shutdown_counter = 0;
+    int ret;
+
     if (signo == SIGINT)
     {
         fprintf (stdout, "\nSIGINT detected, shutting down\n");
@@ -20,79 +26,36 @@ void sig_handler (int signo)
         //Wait for threads to die
         if (cfg_gpio_engine)
         {
-            shutdown_counter = 0;
             if (verbose)
                 fprintf (stdout, "Waiting for GPIO to shutdown\n");
-
-            while (pthread_kill (thread1, 0) == 0)
-            {
-                sleep(1);
-                if (shutdown_counter++ > 5)
-                {
-                    if (verbose)
-                        fprintf (stdout, "Failed to shutdown GPIO thread\n");
-                    break;
-                }
-            }
+            SDL_WaitThread (thread1, &ret);
         }
        
         if (cfg_udp_engine)
         {
-            SDLNet_Quit();
-        }
-
-        /* FIXME UDP never exits?
-        if (cfg_udp_engine)
-        {
             if (verbose)
-                fprintf (stdout, "Waiting for UDP server to shutdown\n");
-            while (pthread_kill (thread2, 0) == 0) {
-            printf ("WAITING\n");
-            sleep (1);
-            }
-
+                fprintf (stdout, "Waiting for UDP to shutdown\n");
+            SDLNet_Quit();
+            SDL_WaitThread (thread2, &ret);
         }
-        */
+
         if (cfg_gfx_engine)
         {
-            shutdown_counter = 0;
             if (verbose)
                 fprintf (stdout, "Waiting for GFX to shutdown\n");
-            while (pthread_kill (thread3, 0) == 0)
-            {
-                sleep(1);
-                if (shutdown_counter++ > 5)
-                {
-                    if (verbose)
-                        fprintf (stdout, "Failed to shutdown GFX thread\n");
-                    break;
-                }
-            }
+            SDL_WaitThread (thread3, &ret);
         }
         
-        shutdown_counter = 0;
         if (verbose)
             fprintf (stdout, "Waiting for sound to shutdown\n");
-        
-        while (pthread_kill (thread4, 0) == 0)
-        {
-            sleep(1);
-            if (shutdown_counter++ > 5)
-            {
-                if (verbose)
-                    fprintf (stdout, "Failed to shutdown sound thread\n");
-                break;
-            }
-        }
-        
+        SDL_WaitThread (thread4, &ret);
+
         shutdown_status = 1;
     }
 }
 
 int main (int argc, char *argv[])
 {
-    int ret;
-
     fprintf (stdout, "=========\n");
     fprintf (stdout, "|PiSound|\n");
     fprintf (stdout, "=========\n\n");
@@ -126,29 +89,14 @@ int main (int argc, char *argv[])
 
     running = 1;
 
-#ifdef BUILD_GFX    
-    //Start the gfx thread
-    if (cfg_gfx_engine)
-    {
-        ret = pthread_create (&thread3, NULL, gfx_thread, NULL);
-        if (ret)
-        {
-            fprintf(stderr,"Error creating gfx_thread: %i\n", ret);
-            return 1;
-        }
-        else
-            fprintf (stdout, "GFX thread started\n");
-    }
-#endif
-
 #ifdef BUILD_GPIO
     //Start the GPIO thread
     if (cfg_gpio_engine)
     {
-        ret = pthread_create (&thread1, NULL, gpio_thread, &music_requested);
-        if (ret)
+        thread1 = SDL_CreateThread (gpio_thread, "GPIOThread", NULL);
+        if (thread1 == NULL)
         {
-            fprintf(stderr,"Error creating gpio_thread: %i\n", ret);
+            fprintf(stderr,"Error creating gpio_thread: %s\n", SDL_GetError());
             return 1;
         }
         else
@@ -165,16 +113,32 @@ int main (int argc, char *argv[])
             return 1;
         }
 
-        ret = pthread_create (&thread2, NULL, udp_thread, NULL);
-        if (ret)
+        thread2 = SDL_CreateThread (udp_thread, "UDPThread", NULL);
+        if (thread2 == NULL)
         {
-            fprintf(stderr,"Error creating udp_thread: %i\n",ret);
+            fprintf(stderr,"Error creating udp_thread: %s\n",SDL_GetError());
             return 1;
         }
         else
             fprintf (stdout, "UDP thread started\n");
     }
- 
+
+#ifdef BUILD_GFX    
+    //Start the gfx thread
+    if (cfg_gfx_engine)
+    {
+        thread3 = SDL_CreateThread (gfx_thread, "GFXThread", NULL);
+        if (thread3 == NULL)
+        {
+            fprintf(stderr,"Error creating gfx_thread: %s\n", SDL_GetError());
+            return 1;
+        }
+        else
+            fprintf (stdout, "GFX thread started\n");
+    }
+#endif
+
+
     if (init_audio () != 0)
     {
         fprintf (stderr, "Error initialising audio\n");
@@ -189,10 +153,10 @@ int main (int argc, char *argv[])
     }
 
     //Start main audio thread
-    ret = pthread_create (&thread4, NULL, snd_thread, NULL);
-    if (ret)
+    thread4 = SDL_CreateThread (snd_thread, "SNDThread", NULL);
+    if (thread4 == NULL)
     {
-        fprintf(stderr,"Error creating sound thread: %i\n",ret);
+        fprintf(stderr,"Error creating sound thread: %s\n", SDL_GetError());
         return 1;
     }
     else

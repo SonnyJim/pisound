@@ -143,26 +143,26 @@ static void udp_decode_msg (char *msg, Uint32 cliaddr)
     }
 }
 
-void* udp_thread (void *ptr)
+int udp_thread (void *ptr)
 {
     /* Open a UDP socket */
     if (!(sd = SDLNet_UDP_Open(UDP_PORT)))
     {
         fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-        return NULL;
+        return 1;
     }
 
-    /* Make space for the packet */
+    /* Make space for the recv and sending packet */
     if (!(pm = SDLNet_AllocPacket(UDP_BUFFLEN)))
     {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-        return NULL;
+        return 1;
     }
     
     if (!(pms = SDLNet_AllocPacket(UDP_BUFFLEN)))
     {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-        return NULL;
+        return 1;
     }
 
     while (running)
@@ -177,5 +177,6 @@ void* udp_thread (void *ptr)
         fprintf (stdout, "Shutting down udp server\n");
     SDLNet_FreePacket(pm);
     SDLNet_FreePacket(pms);
-    return NULL;
+    SDLNet_UDP_Close (sd);
+    return 0;
 }

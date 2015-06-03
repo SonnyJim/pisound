@@ -10,6 +10,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL_net.h>
+#include <SDL_thread.h>
 
 #include "cfg.h"
 
@@ -55,15 +56,16 @@ int loading_resources;
 int shutdown_status;
 
 //Threads
-pthread_t thread1; // GPIO
-pthread_t thread2; // UDP
-pthread_t thread3; // GFX
-pthread_t thread4; // Audio
+//pthread_t thread1; // GPIO
+//pthread_t thread2; // UDP
+//pthread_t thread3; // GFX
+//pthread_t thread4; // Audio
 
-void* udp_thread (void *ptr);
-void* gpio_thread (void *ptr);
-void* gfx_thread (void *ptr);
-void* snd_thread (void *ptr);
+
+int gpio_thread (void *ptr);
+int udp_thread (void *ptr);
+int gfx_thread (void *ptr);
+int snd_thread (void *ptr);
 
 void volume_up (void);
 void volume_down (void);
