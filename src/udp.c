@@ -4,10 +4,9 @@
 #include "gfx.h"
 #include "scene.h"
 
-static void udp_send_msg (char *msg, struct sockaddr_in cliaddr)
+static void udp_send_msg (char *msg, IPaddress *cliaddr)
 {
-    cliaddr.sin_port = htons (UDP_PORT);
-    sendto(sockfd, msg, strlen (msg),0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
+    
 }
 
 static void udp_score_receive (char *msg)
@@ -27,7 +26,7 @@ static void udp_scene_receive (long scene)
     else
     {
         fprintf (stderr, "Error: requested scene %lu out of range\n", scene);
-        udp_send_msg (UDP_MSG_ERROR, cliaddr);
+    //    udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
 }
 
@@ -48,11 +47,11 @@ static void udp_player_num (long num)
     else
     {
         fprintf (stderr, "Error: udp_player_num out of range\n");
-        udp_send_msg (UDP_MSG_ERROR, cliaddr);
+//        udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
 }
 
-static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
+static void udp_decode_msg (char *msg, IPaddress *cliaddr)
 {
     int byte1, byte2;
     char cmd[3], code[3];
@@ -139,37 +138,36 @@ static void udp_decode_msg (char *msg, struct sockaddr_in cliaddr)
 
 void* udp_thread (void *ptr)
 {
-   if ((sockfd = socket(AF_INET,SOCK_DGRAM,0)) == -1)
-   {
-        fprintf (stderr, "Can't create socket: %s\n", strerror(errno));
-   }
+    /* Open a UDP socket */
+    if (!(sd = SDLNet_UDP_Open(UDP_PORT)))
+    {
+        fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
+        return NULL;
+    }
 
-   memset (&servaddr, 0, sizeof(servaddr));
-   servaddr.sin_family = AF_INET;
-   servaddr.sin_addr.s_addr = htonl (INADDR_ANY);
-   servaddr.sin_port = htons (UDP_PORT);
+    /* Make space for the packet */
+    if (!(pm = SDLNet_AllocPacket(UDP_BUFFLEN)))
+    {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        return NULL;
+    }
+    
+    if (!(pms = SDLNet_AllocPacket(UDP_BUFFLEN)))
+    {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        return NULL;
+    }
 
-   if (bind (sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1)
-   {
-       fprintf (stderr, "Error starting udp server: %s\n", strerror(errno));
-   }
-   else
-   {
-       if (verbose)
-           fprintf (stdout, "udp server running on %i\n", UDP_PORT);
-       while (running)
-       {
-           len = sizeof(cliaddr);
-           n = recvfrom (sockfd, mesg, UDP_BUFFLEN, 0, (struct sockaddr *) &cliaddr,&len);
-           //Echo request
-           //sendto(sockfd,mesg,n,0,(struct sockaddr *)&cliaddr,sizeof(cliaddr));
-           //mesg[n] = 0;
-           udp_decode_msg (mesg, cliaddr);
-           memset (mesg, 0, sizeof(mesg));
-       }
-       if (verbose)
-           fprintf (stdout, "Shutting down udp server\n");
-   }
-   
-   return NULL;
+    while (running)
+    {
+        if (SDLNet_UDP_Recv(sd, pm))
+        {
+            udp_decode_msg ((char *)pm->data, (IPaddress *)pm->address.host);
+        }
+    }
+    
+    if (verbose)
+        fprintf (stdout, "Shutting down udp server\n");
+    SDLNet_FreePacket(pm);
+    return NULL;
 }

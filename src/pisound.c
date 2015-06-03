@@ -35,7 +35,12 @@ void sig_handler (int signo)
                 }
             }
         }
-        
+       
+        if (cfg_udp_engine)
+        {
+            SDLNet_Quit();
+        }
+
         /* FIXME UDP never exits?
         if (cfg_udp_engine)
         {
@@ -154,6 +159,12 @@ int main (int argc, char *argv[])
     //Start the udp server
     if (cfg_udp_engine)
     {
+        if ( SDLNet_Init() != 0) 
+        {
+            fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
+            return 1;
+        }
+
         ret = pthread_create (&thread2, NULL, udp_thread, NULL);
         if (ret)
         {

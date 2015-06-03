@@ -1,6 +1,6 @@
 #include "pisound.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
+//#include <sys/socket.h>
+//#include <netinet/in.h>
 
 /*
  * UDP message format:
@@ -34,7 +34,13 @@
 #define UDP_MSG_PING    "PONG"
 #define UDP_MSG_VERSION "Pisound V0.1"
 
+UDPsocket sd; //Socket descriptor
+UDPpacket *pm; //Packet memory ptr
+UDPpacket *pms; //Packet memory send ptr
+IPaddress cliaddr;
+/*
 int sockfd,n;
 struct sockaddr_in servaddr,cliaddr;
 socklen_t len;
+*/
 char mesg[UDP_BUFFLEN];
