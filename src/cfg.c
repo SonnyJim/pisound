@@ -40,10 +40,10 @@ static int cfg_load_sounds (void)
             len = strlen (sound_file);
             if (sound_file[len - 1] == '\n')
                 sound_file[len - 1] = '\0';
-          
+            /* 
             if (verbose)
                 fprintf (stdout, "Loading %s @ position %i\n", sound_file, sound_num);
-            
+            */
             sounds[sound_num] = Mix_LoadWAV (sound_file);
 	       
             if(sounds[sound_num] == NULL) 
@@ -87,9 +87,10 @@ static int cfg_load_music (void)
             len = strlen (sound_file);
             if (sound_file[len - 1] == '\n')
                 sound_file[len - 1] = '\0';
-          
+            /*      
             if (verbose)
                 fprintf (stdout, "Loading %s @ position %i\n", sound_file, sound_num);
+            */
             music[sound_num] = Mix_LoadMUS (sound_file);
 	        if(music[sound_num] == NULL) 
             {

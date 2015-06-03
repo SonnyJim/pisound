@@ -1,3 +1,5 @@
+#include <SDL2/SDL.h>
+
 //SDL_Surface *score_srf; 
 SDL_Surface *score_outline_srf; 
 SDL_Texture *score_tex; 
@@ -5,6 +7,7 @@ SDL_Texture *score_outline_tex;
 SDL_Rect    score_rect;
 SDL_Surface *background_srf; 
 SDL_Texture *background_tex; 
+SDL_Rect    background_rect;
 
 SDL_Surface *sprite_srf;
 

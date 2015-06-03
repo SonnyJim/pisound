@@ -2,7 +2,8 @@
 import socket, sys, thread
 import tty, termios
 
-IP = "127.0.0.1"
+#IP = "127.0.0.1"
+IP = "192.168.1.80"
 PORT = 8008
 RECV_BUFFSIZE = 1024
 running = 0
@@ -66,14 +67,17 @@ def send_thread ():
             message = "0004"
         elif readkey == "p":
             message = "fe"
-        elif readkey == "t":
+        elif readkey == "M":
             message = raw_input ("Enter in custom message: ")
         elif readkey == "Q":
             print "Shutting down pisound server"
             message = "fc"
         elif readkey == "c":
-            message = "fb"
+            message = "fa"
             message += raw_input ("Enter scene number: ")
+        elif readkey == "t":
+            message = "fb"
+            message += raw_input ("Enter transition effect: ")
         elif readkey == "S":
             message = "e0"
             message += raw_input ("Enter score: ")
@@ -96,10 +100,11 @@ print "s            Send sound code"
 print "m            Send music code"
 print "v            Set volume"
 print "c            Change scene"
+print "t            Change transition effect"
 print "S            Send score"
 print "P            Change player"
 print "p            Ping!"
-print "t            Send custom message"
+print "M            Send custom message"
 print "Q            Shutdown pisound"
 print "q            Quit UDP client"
 

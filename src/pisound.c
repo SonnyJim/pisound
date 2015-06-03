@@ -95,8 +95,6 @@ int main (int argc, char *argv[])
     running = 0;
     shutdown_status = 0;
     loading_resources = 1;
-    current_scene = BOOT;
-    running_scene = INVALID_SCENE;
     
     //Check PID file
     if (check_pid () != 0)

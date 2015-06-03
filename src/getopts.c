@@ -6,6 +6,7 @@ void show_args (void)
     fprintf (stdout, "      -v          Verbose output\n");
 #ifdef BUILD_GFX
     fprintf (stdout, "      -g          Enable GFX \n");
+    fprintf (stdout, "      -l          Don't show Pisound logo on startup\n");
 #endif
     fprintf (stdout, "      -a          Enable audio \n");
 #ifdef BUILD_GPIO
@@ -13,7 +14,6 @@ void show_args (void)
 #endif
     fprintf (stdout, "      -u          Enable UDP server\n");
     fprintf (stdout, "      -f          Show average frames per second\n");
-    fprintf (stdout, "      -l          Don't show Pisound logo on startup\n");
     fprintf (stdout, "      -h          This help screen\n");
 }
 

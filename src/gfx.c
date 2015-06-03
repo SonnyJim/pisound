@@ -31,6 +31,17 @@ SDL_Texture* load_image_to_texture (char *filename)
     return dst_texture;
 }
 
+//Setup the transition textures
+void init_trans_textures (void)
+{
+    trans_scene1 = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+    trans_scene2 = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+    if (trans_scene1 == NULL || trans_scene2 == NULL)
+    {
+        fprintf (stderr, "Error setting up trans_textures: %s\n", SDL_GetError());
+        running = 0;
+    }
+}
 
 void show_pisound_logo (void)
 {
@@ -96,7 +107,6 @@ void show_pisound_logo (void)
 int init_screen (void)
 {
     int i, numdrivers;
-    SDL_RendererInfo drinfo; 
 
     if (SDL_Init (SDL_INIT_VIDEO) != 0)
     {
@@ -132,6 +142,7 @@ int init_screen (void)
         {
             fprintf (stdout, "Driver %i: %s\n", i,  SDL_GetVideoDriver(i));
         }
+        fprintf (stdout, "Using %s\n", SDL_GetCurrentVideoDriver());
     }
 
     numdrivers = SDL_GetNumRenderDrivers ();
@@ -145,33 +156,23 @@ int init_screen (void)
             fprintf (stdout, "Driver %i: %s\n", i, drinfo.name);
         }
     }
-    
-    //Try all the different SDL2 drivers until we find one that works ;-)
-    for (i = 0; i < numdrivers; i++)
-    {
-        if (verbose)
-            fprintf (stdout, "Trying render driver %i\n", i);
-        renderer = SDL_CreateRenderer(window, i, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-        
-        if (renderer == NULL)
-            fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
-        else
-            break;
-    }
+   
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
     
     if (renderer == NULL)
     {
         fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
-        renderer = SDL_CreateRenderer(window, -1, 0);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE |  SDL_RENDERER_TARGETTEXTURE);
         if (renderer == NULL)
         {
-            fprintf (stderr, "Error creating renderer: %s\n", SDL_GetError());
+            fprintf (stderr, "Error creating software renderer: %s\n", SDL_GetError());
             return 1;
         }
     }
-    
-    SDL_GetRenderDriverInfo (i, &drinfo);
+
+    SDL_GetRendererInfo (renderer, &drinfo);
     fprintf (stdout, "Using %s driver\n", drinfo.name);
+
     return 0;
 }
 
@@ -191,6 +192,7 @@ void* gfx_thread (void *ptr)
     if (init_screen () != 0)
     {
         fprintf (stderr, "Error setting up screen\n");
+        running = 0;
         return NULL;
     }
 
@@ -210,17 +212,17 @@ void* gfx_thread (void *ptr)
         fpsFrames = 0;
         fpsStart = SDL_GetTicks ();
     }
-
+    init_trans_textures ();
     gfx_init_game_vars ();
+    requested_scene = BOOT;
+    running_scene = INVALID_SCENE;
     while (running)
     {
-        SDL_RenderClear(renderer);
-        if (!scene_draw ())
+        if (scene_draw ())
         {
             fprintf (stderr, "Error in scene_draw()\n");
             running = 0;
         }
-        SDL_RenderPresent (renderer);
         
         if (cfg_show_fps)
         {

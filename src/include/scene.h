@@ -1,6 +1,6 @@
-#define MAX_SCENES 6
+#define MAX_SCENES 8
 
-int current_scene, running_scene, current_subscene, running_subscene;
+int running_scene, requested_scene, current_subscene, running_subscene;
 
 int scene_draw (void);
 
@@ -24,6 +24,10 @@ enum scenes {
     INVALID_SCENE
 };
 
+
+int scene_transition;
+int scene_transition_running;
+
 enum game_subscenes {
     GAME_SIGN,
     GAME_MINE,
@@ -38,3 +42,4 @@ struct subscene_ops {
 };
 
 void game_sign_init (void);
+

@@ -2,6 +2,8 @@
 #include <locale.h> //Used to set locale for score separator
 #include <SDL2/SDL_image.h>
 
+#include "fonts.h"
+
 //#define SCORE_SEPARATOR ','
 #define MAX_FONTS 255
 #define CFG_FONT_FILE "fonts.cfg"
@@ -12,6 +14,11 @@ SDL_Color textColor;
 SDL_DisplayMode videomode;
 SDL_Window *window;
 SDL_Renderer *renderer;
+SDL_RendererInfo drinfo; 
+
+//Textures for transition effects
+SDL_Texture *trans_scene1;
+SDL_Texture *trans_scene2;
 
 int SCREEN_HEIGHT;
 int SCREEN_WIDTH;
