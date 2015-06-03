@@ -4,6 +4,7 @@ import tty, termios
 
 #IP = "127.0.0.1"
 IP = "192.168.1.80"
+RIP = "192.168.1.76"
 PORT = 8008
 RPORT = 8009
 RECV_BUFFSIZE = 1024
@@ -90,7 +91,7 @@ def send_thread ():
             running = 0
 
         if len(message) > 0:
-            sock.sendto(message, (IP, PORT))
+            sock.sendto(message, (RIP, PORT))
         message = ""
 
 running = 1
