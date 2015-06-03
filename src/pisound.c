@@ -164,7 +164,8 @@ int main (int argc, char *argv[])
 
     while (running) 
     {
-        sleep (1);
+        SDL_Delay (1000);
+        //sleep (1);
     }
 
     int counter = 0;
@@ -172,7 +173,8 @@ int main (int argc, char *argv[])
     {
         raise (SIGINT);
         fprintf (stdout, "Waiting for threads to shutdown %i\n", counter);
-        sleep (1);
+        SDL_Delay (1000);
+        //sleep (1);
         //If threads havent responded by 3 seconds, shutdown now
         if (++counter > 3)
             shutdown_status = 1;
