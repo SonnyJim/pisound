@@ -178,5 +178,6 @@ int udp_thread (void *ptr)
     SDLNet_FreePacket(pm);
     SDLNet_FreePacket(pms);
     SDLNet_UDP_Close (sd);
+    SDLNet_Quit ();
     return 0;
 }

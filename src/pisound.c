@@ -35,7 +35,6 @@ void sig_handler (int signo)
         {
             if (verbose)
                 fprintf (stdout, "Waiting for UDP to shutdown\n");
-            SDLNet_Quit();
             SDL_WaitThread (thread2, &ret);
         }
 
