@@ -127,6 +127,11 @@ int cfg_load (void)
         //Ignore remarks
         if (cfg_line[0] != '#')
         {
+            if (strncmp (cfg_line, CFG_VERBOSE, strlen(CFG_VERBOSE)) == 0)
+            {
+                verbose = atoi(cfg_line + strlen(CFG_VERBOSE));
+            }
+
             //Find the volume
             if (strncmp (cfg_line, CFG_VOLUME, strlen(CFG_VOLUME)) == 0)
             {
