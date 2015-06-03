@@ -152,11 +152,6 @@ void* udp_thread (void *ptr)
         return NULL;
     }
 
-    if (!(sds = SDLNet_UDP_Open(0)))
-    {
-        fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-        return NULL;
-    }
     /* Make space for the packet */
     if (!(pm = SDLNet_AllocPacket(UDP_BUFFLEN)))
     {
