@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <pthread.h>
 #include <unistd.h>
 #include <signal.h>
 #include <getopt.h>
@@ -54,13 +53,6 @@ int loading_resources;
 
 //Used to signal shutdown status
 int shutdown_status;
-
-//Threads
-//pthread_t thread1; // GPIO
-//pthread_t thread2; // UDP
-//pthread_t thread3; // GFX
-//pthread_t thread4; // Audio
-
 
 int gpio_thread (void *ptr);
 int udp_thread (void *ptr);
