@@ -198,7 +198,11 @@ int cfg_load (void)
 
             if (strncmp (cfg_line, CFG_UDP_ENGINE, strlen(CFG_UDP_ENGINE)) == 0)
             {
-                cfg_udp_engine = atoi(cfg_line + strlen (CFG_UDP_ENGINE));
+                if (cfg_line[strlen(CFG_UDP_ENGINE)] == 'y' ||
+                        cfg_line[strlen(CFG_UDP_ENGINE)] == 'Y')
+                    cfg_udp_engine = 1;
+                else
+                    cfg_udp_engine = atoi(cfg_line + strlen (CFG_UDP_ENGINE));
                 if (verbose)
                     fprintf (stdout, "%s%i\n", CFG_UDP_ENGINE, cfg_udp_engine);
             }
