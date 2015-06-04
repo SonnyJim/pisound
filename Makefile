@@ -5,7 +5,7 @@ CC	= gcc
 SDL2_CFLAGS := $(shell sdl2-config --cflags)
 SDL2_LDFLAGS := $(shell sdl2-config --libs)
 CFLAGS = -O3 -Wall -Winline -pipe -std=gnu99 $(SDL2_CFLAGS) -I./src/include
-LDLIBS = -lpthread -lSDL2_mixer -lSDL2_net $(SDL2_LDFLAGS) -lm
+LDLIBS = -lSDL2_mixer -lSDL2_net $(SDL2_LDFLAGS) -lm
 
 OBJS = src/pisound.o src/getopts.o src/queue.o src/cfg.o src/udp.o src/volume.o src/pidfile.o src/snd.o
 #HDRS = src/pisound.h src/scene.h src/volume.h src/queue.h src/udp.h src/cfg.h
