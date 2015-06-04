@@ -8,8 +8,8 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
-#include <SDL_net.h>
-#include <SDL_thread.h>
+#include <SDL2/SDL_net.h>
+#include <SDL2/SDL_thread.h>
 
 #include "cfg.h"
 
@@ -75,6 +75,9 @@ void free_sounds (void);
 // pid.c
 int check_pid (void);
 int remove_pid (void);
+
+//gfx.c
+int fullscreen;
 
 //video
 int play_video (void);

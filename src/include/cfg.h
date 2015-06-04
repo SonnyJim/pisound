@@ -10,6 +10,7 @@
 #define CFG_GPIO_ENGINE "gpio_enabled="
 #define CFG_SHOW_LOGO   "show_logo="
 #define CFG_VERBOSE     "verbose="
+#define CFG_FULLSCREEN  "fullscreen="
 
 #define DEFAULT_SOUND_FILE "sounds.cfg"
 #define DEFAULT_MUSIC_FILE "music.cfg"

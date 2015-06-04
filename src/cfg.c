@@ -115,6 +115,8 @@ int cfg_load (void)
     audio_buffers = DEFAULT_AUDIO_BUFFERS;
     audio_rate = DEFAULT_AUDIO_RATE;
 
+    fullscreen = 1;
+
     if (verbose)
         fprintf (stdout, "Attempting to load configuration file %s\n", DEFAULT_CFG_FILE);
     cfg_file = fopen (DEFAULT_CFG_FILE, "r");
@@ -127,6 +129,12 @@ int cfg_load (void)
         //Ignore remarks
         if (cfg_line[0] != '#')
         {
+
+            if (strncmp (cfg_line, CFG_FULLSCREEN, strlen(CFG_FULLSCREEN)) == 0)
+            {
+                fullscreen = atoi(cfg_line + strlen(CFG_FULLSCREEN));
+            }
+
             if (strncmp (cfg_line, CFG_VERBOSE, strlen(CFG_VERBOSE)) == 0)
             {
                 verbose = atoi(cfg_line + strlen(CFG_VERBOSE));
