@@ -1,13 +1,39 @@
 #include "pisound.h"
 #include "gfx.h"
 #include "scene.h"
+#include <locale.h>
 
-//Puts thousand separators into string
+char *commaprint(unsigned long n)
+{
+	static int comma = ',';
+	static char retbuf[30];
+	char *p = &retbuf[sizeof(retbuf)-1];
+	int i = 0;
+
+	*p = '\0';
+
+	do {
+		if(i%3 == 0 && i != 0)
+			*--p = comma;
+		*--p = '0' + n % 10;
+		n /= 10;
+		i++;
+	} while(n != 0);
+
+	return p;
+}
+
 char *render_score_to_string (long long score)
 {
+#ifdef linux
+    //Set locale for thousand separator in render_score
+    setlocale(LC_ALL, "");
     static char newstring[255];
     sprintf (newstring, "%'lld", score);
     return newstring;
+#else
+    return commaprint(score);
+#endif
 }
 
 SDL_Texture* load_image_to_texture (char *filename)
@@ -18,7 +44,7 @@ SDL_Texture* load_image_to_texture (char *filename)
     if (verbose)
         fprintf (stdout, "Loading %s\n", filename);
     src_surface = IMG_Load(filename);
-    
+
     if (src_surface == NULL)
         fprintf (stderr, "Error loading sprite: %s\n", IMG_GetError());
     else
@@ -68,12 +94,12 @@ void show_pisound_logo (void)
         frog_srcrect.w = FROG_SIZE;
         frog_srcrect.h = FROG_SIZE;
 
-        SDL_RenderClear (renderer);    
+        SDL_RenderClear (renderer);
         SDL_RenderCopy (renderer, bootlogo_tex, NULL, NULL);
         SDL_RenderCopy (renderer, frog_tex, &frog_srcrect, &frog_dstrect);
         SDL_RenderPresent (renderer);
         SDL_Delay (150);
-    
+
         if (anim_step < 3)
         {
             anim_frame++;
@@ -113,13 +139,13 @@ int init_screen (void)
         fprintf (stderr, "\nError initialising SDL video: %s\n", SDL_GetError ());
         return 1;
     }
-    
+
     if (SDL_GetCurrentDisplayMode (0, &videomode) != 0)
     {
         fprintf (stderr, "Error getting current display mode: %s\n", SDL_GetError ());
         return 1;
     }
-    
+
     SCREEN_WIDTH = videomode.w;
     SCREEN_HEIGHT = videomode.h;
 
@@ -160,9 +186,9 @@ int init_screen (void)
             fprintf (stdout, "Driver %i: %s\n", i, drinfo.name);
         }
     }
-   
+
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
-    
+
     if (renderer == NULL)
     {
         fprintf (stderr, "Error:  Couldn't find a hardware renderer that works, trying a software renderer\n");
@@ -189,7 +215,7 @@ int load_gfx_resources (void)
 static void sdl_poll_event (void)
 {
     SDL_Event event;
-    
+
     SDL_PollEvent (&event);
     if (event.type == SDL_QUIT)
         running = 0;
@@ -198,9 +224,6 @@ static void sdl_poll_event (void)
 int gfx_thread (void *ptr)
 {
     int font_num;
-
-    //Set locale for thousand separator in render_score
-    setlocale(LC_NUMERIC, "");
 
     if (init_screen () != 0)
     {
@@ -219,7 +242,7 @@ int gfx_thread (void *ptr)
 
    // if (play_video () != 0)
    //     fprintf (stderr, "Something broke whilst playing a video\n");
-    
+
     if (cfg_show_fps)
     {
         fpsFrames = 0;
@@ -238,7 +261,7 @@ int gfx_thread (void *ptr)
             fprintf (stderr, "Error in scene_draw()\n");
             running = 0;
         }
-        
+
         if (cfg_show_fps)
         {
             fpsFrames++;
@@ -248,14 +271,14 @@ int gfx_thread (void *ptr)
         }
         sdl_poll_event ();
     }
-   
-    //Close the fonts that were used 
+
+    //Close the fonts that were used
     for (font_num = 0; font_num < MAX_FONTS; font_num++)
         TTF_CloseFont(fonts[font_num]);
     TTF_Quit();
 
     SDL_QuitSubSystem (SDL_INIT_VIDEO);
-    
+
     if (verbose)
        fprintf (stdout, "GFX thread stopped\n");
 
