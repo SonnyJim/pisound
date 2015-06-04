@@ -186,9 +186,17 @@ int load_gfx_resources (void)
     return 0;
 }
 
-int gfx_thread (void *ptr)
+static void sdl_poll_event (void)
 {
     SDL_Event event;
+    
+    SDL_PollEvent (&event);
+    if (event.type == SDL_QUIT)
+        running = 0;
+}
+
+int gfx_thread (void *ptr)
+{
     int font_num;
 
     //Set locale for thousand separator in render_score
@@ -238,7 +246,7 @@ int gfx_thread (void *ptr)
             if (fpsFrames % 1000 == 0)
                 fprintf (stdout, "Average FPS = %f\n", fpsAvg);
         }
-        SDL_PollEvent (&event);
+        sdl_poll_event ();
     }
    
     //Close the fonts that were used 
