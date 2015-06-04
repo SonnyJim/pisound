@@ -70,6 +70,9 @@ int snd_thread (void *ptr)
         music_check ();
         sound_check ();
     }
+    free_sounds ();
+    Mix_CloseAudio();
+	
     fprintf (stdout, "Audio thread stopped\n");
     return 0;
 }

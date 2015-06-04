@@ -9,10 +9,8 @@ SDL_Thread *thread4 = NULL; // SND
 
 static void shutdown_pisound (void)
 {
-        free_sounds ();
-	    Mix_CloseAudio();
-	    SDL_Quit();	
-        remove_pid ();
+    SDL_Quit();	
+    remove_pid ();
 }
 
 void sig_handler (int signo)
