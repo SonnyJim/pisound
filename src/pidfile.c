@@ -4,6 +4,7 @@
 
 int remove_pid (void)
 {
+#ifdef linux
     if (verbose)
         fprintf (stdout, "Removing PID file %s\n", PIDFILE);
     if (remove (PIDFILE) != 0)
@@ -12,11 +13,13 @@ int remove_pid (void)
         return 1;
     }
     else
+#endif
         return 0;
 }
 
 int check_pid (void)
 {
+#ifdef linux
     FILE *fd;
     int pid = getpid ();
     int oldpid;
@@ -61,5 +64,6 @@ int check_pid (void)
     //Write PID to file
     fprintf (fd, "%d\n", pid);
     fclose (fd);
+#endif
     return 0;
 }
