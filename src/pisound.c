@@ -1,5 +1,6 @@
 #include "pisound.h"
 #include "queue.h"
+#include "snd.h"
 #include "scene.h"
 
 SDL_Thread *thread1 = NULL; // GPIO
