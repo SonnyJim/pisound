@@ -42,16 +42,16 @@ OBJS += $(HDRS)
 
 listdir: tools/listdir.o
 	@echo [link]
-	@$(CC) -o tools/$@ $^ $(LDFLAGS) $(LDLIBS)
+	@$(CC) -o tools/$@ $^ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
 
 fontgen: tools/fontgen.o
 	@echo [Linking fontgen]
-	@$(CC) -o tools/$@ $^ $(LDFLAGS) $(LDLIBS)
+	@$(CC) -o tools/$@ $^ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
 	@./tools/fontgen
 
 pisound: $(OBJS)
 	@echo [link]
-	@$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+	@$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
 
 clean:
 	@echo "[Removing object files]"
