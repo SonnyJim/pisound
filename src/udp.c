@@ -2,6 +2,7 @@
 #include "udp.h"
 #include "queue.h"
 #include "gfx.h"
+#include "snd.h"
 #include "scene.h"
 
 static void udp_send_msg (char *msg, Uint32 cliaddr)
@@ -98,13 +99,16 @@ static void udp_decode_msg (char *msg, Uint32 cliaddr)
     switch (byte1)
     {
         case UDP_SOUND_PLAY:
-            queue_add (&sfx_q, byte2);
+            if (play_sound (byte2))
+                udp_send_msg (UDP_MSG_ERROR, cliaddr);
             break;
         case UDP_MUSIC_PLAY:
-            music_request (byte2);
+            if (play_music (byte2))
+                udp_send_msg (UDP_MSG_ERROR, cliaddr);
             break;
         case UDP_MUSIC_STOP:
-            music_request (MUSIC_OFF);
+            if (play_music (MUSIC_OFF))
+                udp_send_msg (UDP_MSG_ERROR, cliaddr);
             break;
         case UDP_VOLUME_UP:
             volume_up ();

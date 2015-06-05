@@ -1,4 +1,5 @@
 #include "pisound.h"
+#include "snd.h"
 #include "volume.h"
 
 FILE *sound_list, *cfg_file;
@@ -12,6 +13,7 @@ static int cfg_load_sounds (void)
 {
     //Initilise sound array
     init_sounds ();
+    num_sounds = 0;
 
     //Load the sound FX
     if (verbose)
@@ -51,6 +53,7 @@ static int cfg_load_sounds (void)
 		        fprintf(stderr, "\nUnable to load file %s: %s\n", sound_file, Mix_GetError());
                 return 1;
             }
+            num_sounds++;
         }
     }
     fclose (sound_list);
@@ -59,7 +62,7 @@ static int cfg_load_sounds (void)
 
 static int cfg_load_music (void)
 {
-
+    num_music = 0;
     //Load the music WAVs
     if (verbose)
         fprintf (stdout, "Attempting to load music list %s\n", DEFAULT_MUSIC_FILE);
@@ -97,6 +100,7 @@ static int cfg_load_music (void)
 		        printf("\nUnable to load file %s: %s\n", sound_file, Mix_GetError());
                 return 1;
             }
+            num_music++;
         }
     }
     fclose (sound_list);

@@ -65,13 +65,6 @@ void volume_set (int volume);
 
 int cfg_load (void);
 
-// snd.c
-int init_audio (void);
-void play_sounds (void);
-
-void init_sounds (void);
-void free_sounds (void);
-
 // pid.c
 int check_pid (void);
 int remove_pid (void);

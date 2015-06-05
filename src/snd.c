@@ -1,5 +1,6 @@
 #include "pisound.h"
 #include "queue.h"
+#include "snd.h"
 #include "volume.h"
 
 //Initialise the sound array with NULL pointers
@@ -17,6 +18,34 @@ void init_sounds (void)
     
 }
 
+int init_audio (void)
+{ 
+    //Initialize SDL audio
+	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
+		printf("Unable to initialize SDL: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	//Initialize SDL_mixer with our chosen audio settings
+	if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
+		printf("Unable to initialize audio: %s\n", Mix_GetError());
+		return 1;
+	}
+
+    //Configure maximum amount of simultaenous voices
+    Mix_AllocateChannels(max_voices);
+    if (verbose)
+        fprintf (stdout, "Max voices %i\n", max_voices);
+    
+    //Initialise the sound_queue
+    queue_init (&sfx_q);
+    
+    //Initialise volume
+    init_volume ();
+
+    return 0;
+}
+
 //Release the memory allocated to our sounds
 void free_sounds (void)
 {
@@ -29,6 +58,28 @@ void free_sounds (void)
     
     music_requested = MUSIC_OFF;
     music_current = MUSIC_OFF;
+}
+
+int play_sound (int sound)
+{
+    if (sound < 0 || sound > num_sounds)
+    {
+        fprintf (stderr, "play_sound: sound out of range %i\n",  sound);
+        return 1;
+    }
+    else
+        return queue_add (&sfx_q, sound);
+}
+
+int play_music (int music)
+{
+    if (music < 0 || music > num_music || music != MUSIC_OFF)
+    {
+        fprintf (stderr, "play_music: music out of range %i\n",  music);
+        return 1;
+    }
+    music_requested = music;
+    return 0;
 }
 
 //Check the sound_queue and play sounds if needed
@@ -76,33 +127,4 @@ int snd_thread (void *ptr)
     fprintf (stdout, "Audio thread stopped\n");
     return 0;
 }
-
-int init_audio (void)
-{ 
-    //Initialize SDL audio
-	if (SDL_Init(SDL_INIT_AUDIO) != 0) {
-		printf("Unable to initialize SDL: %s\n", SDL_GetError());
-		return 1;
-	}
-
-	//Initialize SDL_mixer with our chosen audio settings
-	if(Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0) {
-		printf("Unable to initialize audio: %s\n", Mix_GetError());
-		return 1;
-	}
-
-    //Configure maximum amount of simultaenous voices
-    Mix_AllocateChannels(max_voices);
-    if (verbose)
-        fprintf (stdout, "Max voices %i\n", max_voices);
-    
-    //Initialise the sound_queue
-    queue_init (&sfx_q);
-    
-    //Initialise volume
-    init_volume ();
-
-    return 0;
-}
-
 
