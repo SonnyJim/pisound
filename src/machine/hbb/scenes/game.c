@@ -16,6 +16,25 @@ void game_sign_init (void)
     fprintf (stdout, "Initialising game_sign subscene\n");
 }
 
+void game_mine_init (void)
+{
+    fprintf (stdout, "Initialising game_mine subscene\n");
+}
+
+struct subscene_ops game_sign = 
+{
+    .init = game_sign_init,
+    .name = "Sign",
+    .background = "data/hbb/gfx/backgrounds/sign.png"
+};
+
+struct subscene_ops game_mine =
+{
+    .init = game_mine_init,
+    .name = "Mine",
+    .background = "data/hbb/gfx/backgrounds/mine.png"
+};
+
 static int init_game_scene (void)
 {
     if (verbose)

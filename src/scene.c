@@ -18,13 +18,6 @@ const char *scene_names[] = {
 
 int (*scene_p[MAX_SCENES]) () = {draw_boot, draw_amode, draw_game, draw_gameover, draw_hsentry, draw_test, draw_tilt};
 
-struct subscene_ops game_sign = 
-{
-    .init = game_sign_init,
-    .name = "Sign",
-    .background = "images/backgrounds/sign.png"
-};
-
 static void scene_render_transition (void)
 {
     if (!scene_transition  || !scene_transition_running)
