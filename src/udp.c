@@ -19,7 +19,8 @@ static void udp_send_msg (char *msg, Uint32 cliaddr)
 
 static void udp_score_receive (char *msg)
 {
-    score = strtoll (msg + 1, NULL, 10);
+    //score = msg[1];
+    memcpy (&score, msg + 1, sizeof(score));
     fprintf (stdout, "Score set to %lld\n", score);
 }
 
@@ -59,32 +60,27 @@ static void udp_player_num (long num, Uint32 cliaddr)
     }
 }
 
-static void udp_decode_msg (char *msg, Uint32 cliaddr)
+static void udp_decode_msg (char *msg, Uint32 cliaddr, int len)
 {
     int byte1, byte2;
-    char cmd[3], code[3];
 
-    
-    //Grab the frst 2 bytes and convert to int
-    strncpy (cmd, msg, 2);
-    strncpy (code, msg + 2, 2);
-    byte1 = strtol (cmd, NULL, 16);
-    byte2 = strtol (code, NULL, 16);
-
+    byte1 = msg[0];
+    byte2 = msg[1];
+    fprintf (stdout, "len %i\n", len);
     //Error checking
-    if (strlen (msg) < 1)
+    if (len < 1)
     {
         fprintf (stderr, "Error in udp_decode_msg: tiny message");
         udp_send_msg (UDP_MSG_ERROR, cliaddr);
         return;
     }
-    else if (strlen (msg) < 4 
-            && (byte1 != UDP_SOUND_PLAY || byte1 != UDP_MUSIC_PLAY || byte1 == UDP_SCENE_CHANGE))
+    else if (len < 2
+            && (byte1 == UDP_SOUND_PLAY || byte1 == UDP_MUSIC_PLAY || byte1 == UDP_SCENE_CHANGE))
     {
-        //fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
-        //fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
-        //udp_send_msg (UDP_MSG_ERROR, cliaddr);
-        //return;
+        fprintf (stderr, "Error in udp_decode_msg: Message too short\n");
+        fprintf (stdout, "UDP received: byte1=%i byte2=%i msg=%s\n", byte1, byte2, msg);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
+        return;
     }
 
     if (byte1 > 255 || byte2 > 255)
@@ -149,6 +145,7 @@ static void udp_decode_msg (char *msg, Uint32 cliaddr)
 
 int udp_thread (void *ptr)
 {
+ 
     /* Open a UDP socket */
     if (!(sd = SDLNet_UDP_Open(UDP_PORT)))
     {
@@ -156,6 +153,25 @@ int udp_thread (void *ptr)
         return 1;
     }
 
+ /* 
+    IPaddress serverIP;
+    if (cfg_server_host[0] != '\0')
+    {
+        if (SDLNet_ResolveHost (&serverIP, cfg_server_host, UDP_PORT) != 0)
+        {
+            fprintf (stderr, "Error resolving %s\n", cfg_server_host);
+            return 1;
+        }
+        if (verbose)
+            fprintf (stdout, "Server IP: %s\n", cfg_server_host);
+        if (SDLNet_UDP_Bind (sd, 1, &serverIP) == -1)
+        {
+            fprintf (stderr, "Error binding socket\n");
+            return 1;
+        }
+        fprintf (stdout, "resolved: %s\n", SDLNet_ResolveIP (&serverIP));
+    }
+*/
     /* Make space for the recv and sending packet */
     if (!(pm = SDLNet_AllocPacket(UDP_BUFFLEN)))
     {
@@ -173,7 +189,7 @@ int udp_thread (void *ptr)
     {
         if (SDLNet_UDP_Recv(sd, pm))
         {
-            udp_decode_msg ((char *)pm->data, pm->address.host);
+            udp_decode_msg ((char *)pm->data, pm->address.host, pm->len);
         }
     }
     
