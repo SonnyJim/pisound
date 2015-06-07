@@ -217,7 +217,7 @@ static void sdl_poll_event (void)
     SDL_Event event;
 
     SDL_PollEvent (&event);
-    if (event.type == SDL_QUIT)
+    if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
         running = 0;
 }
 
