@@ -19,12 +19,12 @@ static void udp_send_msg (char *msg, Uint32 cliaddr)
 
 static void udp_score_receive (char *msg)
 {
-    //score = msg[1];
     memcpy (&score, msg + 1, sizeof(score));
-    fprintf (stdout, "Score set to %lld\n", score);
+    if (verbose)
+        fprintf (stdout, "Score set to %lld\n", score);
 }
 
-static void udp_scene_receive (long scene, Uint32 cliaddr)
+static void udp_scene_receive (Uint8 scene, Uint32 cliaddr)
 {
     if (scene >= 0 && scene <= MAX_SCENES)
     {
@@ -39,7 +39,7 @@ static void udp_scene_receive (long scene, Uint32 cliaddr)
     }
 }
 
-static void udp_scene_trans (long trans)
+static void udp_scene_trans (Uint8 trans)
 {
     if (verbose)
         fprintf (stdout, "transition requested: %lu\n", trans);
@@ -47,8 +47,11 @@ static void udp_scene_trans (long trans)
         scene_transition = (int) trans;
 }
 
-static void udp_player_num (long num, Uint32 cliaddr)
+static void udp_player_num (Uint8 num, Uint32 cliaddr)
 {
+    if (verbose)
+        fprintf (stdout, "udp_player_num: %i\n", num);
+
     if (num > 0 && num <= MAX_PLAYERS)
     {
         player_num = (int) num;
