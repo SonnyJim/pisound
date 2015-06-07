@@ -26,15 +26,15 @@ static void udp_score_receive (char *msg)
 
 static void udp_scene_receive (Uint8 scene, Uint32 cliaddr)
 {
-    if (scene >= 0 && scene <= MAX_SCENES)
+    if (scene >= 0 && scene < MAX_SCENES)
     {
         if (verbose)
-            fprintf (stdout, "scene change requested: %lu\n", scene);
+            fprintf (stdout, "scene change requested: %i\n", scene);
         requested_scene = (int) scene;
     }
     else
     {
-        fprintf (stderr, "Error: requested scene %lu out of range\n", scene);
+        fprintf (stderr, "Error: requested scene %i out of range\n", scene);
         udp_send_msg (UDP_MSG_ERROR, cliaddr);
     }
 }
@@ -42,7 +42,7 @@ static void udp_scene_receive (Uint8 scene, Uint32 cliaddr)
 static void udp_scene_trans (Uint8 trans)
 {
     if (verbose)
-        fprintf (stdout, "transition requested: %lu\n", trans);
+        fprintf (stdout, "transition requested: %i\n", trans);
     if (!scene_transition_running)
         scene_transition = (int) trans;
 }
@@ -54,7 +54,7 @@ static void udp_player_num (Uint8 num, Uint32 cliaddr)
 
     if (num > 0 && num <= MAX_PLAYERS)
     {
-        player_num = (int) num;
+        player_num = num;
     }
     else
     {
