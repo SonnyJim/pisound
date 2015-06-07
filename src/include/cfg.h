@@ -11,6 +11,7 @@
 #define CFG_SHOW_LOGO   "show_logo="
 #define CFG_VERBOSE     "verbose="
 #define CFG_FULLSCREEN  "fullscreen="
+#define CFG_LISTEN  "listen="
 
 #define DEFAULT_SOUND_FILE "sounds.cfg"
 #define DEFAULT_MUSIC_FILE "music.cfg"
@@ -20,6 +21,9 @@ int cfg_gfx_engine;
 int cfg_audio_engine;
 int cfg_udp_engine;
 int cfg_gpio_engine;
+int cfg_fullscreen;
+char *cfg_server_host;
+
 
 int cfg_show_fps;
 int cfg_show_logo;
