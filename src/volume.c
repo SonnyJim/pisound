@@ -33,6 +33,8 @@ void volume_up (void)
         Mix_Volume (-1, volume);    
         Mix_VolumeMusic (volume);
     }
+    else
+        fprintf (stderr, "volume:  At max already\n");
 }
 
 void volume_down (void)
