@@ -4,7 +4,7 @@ BUILD_GFX = y
 CC	= gcc
 SDL2_CFLAGS := $(shell sdl2-config --cflags)
 SDL2_LDFLAGS := $(shell sdl2-config --libs)
-CFLAGS = -O3 -Wall -Winline -pipe -std=gnu99 $(SDL2_CFLAGS) -I./src/include
+CFLAGS = -O3 -Wall -Winline -pipe -std=gnu99 $(SDL2_CFLAGS) -I./src/include -I./src
 LDLIBS = -lSDL2_mixer -lSDL2_net $(SDL2_LDFLAGS) -lm
 
 OBJS = src/pisound.o src/getopts.o src/queue.o src/cfg.o src/udp.o src/volume.o src/pidfile.o src/snd.o
@@ -39,6 +39,10 @@ debug: CFLAGS += -g
 debug: clean all
 
 OBJS += $(HDRS)
+
+udp_client: tools/udp_client.o
+	@echo [link]
+	@$(CC) -o tools/$@ $^ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
 
 listdir: tools/listdir.o
 	@echo [link]
