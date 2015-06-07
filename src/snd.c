@@ -73,7 +73,7 @@ int play_sound (int sound)
 
 int play_music (int music)
 {
-    if (music < 0 || music > num_music || music != MUSIC_OFF)
+    if ((music < 0 || music > num_music) && music != MUSIC_OFF)
     {
         fprintf (stderr, "play_music: music out of range %i\n",  music);
         return 1;
