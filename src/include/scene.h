@@ -1,4 +1,4 @@
-#define MAX_SCENES 8
+#define MAX_SCENES 7
 
 int running_scene, requested_scene, current_subscene, running_subscene;
 
