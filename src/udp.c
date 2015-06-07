@@ -62,11 +62,11 @@ static void udp_player_num (long num, Uint32 cliaddr)
 
 static void udp_decode_msg (char *msg, Uint32 cliaddr, int len)
 {
-    int byte1, byte2;
+    Uint8 byte1, byte2;
 
     byte1 = msg[0];
     byte2 = msg[1];
-    fprintf (stdout, "len %i\n", len);
+    
     //Error checking
     if (len < 1)
     {
