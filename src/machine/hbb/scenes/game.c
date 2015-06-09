@@ -116,7 +116,7 @@ static void render_score (void)
         TTF_SizeText (FON_CHIZ_BOLD_40, player_str, &textWidth, &textHeight);
 
         xpos = (SCREEN_WIDTH - textWidth) / 2;
-        ypos = (SCREEN_HEIGHT / 384) * 44;
+        ypos = (SCREEN_HEIGHT / 384) * 30;
 
         player_rect.x = xpos;
         player_rect.y = ypos;
