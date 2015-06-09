@@ -48,7 +48,8 @@ int scene_draw (void)
     else if (scene_transition && !scene_transition_running && running_scene != requested_scene)
     {
         //Setup the scene transition
-        fprintf (stdout, "trans=%i current=%i running =%i\n", scene_transition, requested_scene, running_scene);
+        if (verbose)
+            fprintf (stdout, "trans requested=%i current=%i running =%i\n", scene_transition, requested_scene, running_scene);
         if (scene_transition > NUM_TRANS_FX)
         {
             fprintf (stderr, "scene_draw:  Requested scene_transition out of range\n");
