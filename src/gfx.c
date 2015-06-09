@@ -146,16 +146,22 @@ int init_screen (void)
         return 1;
     }
 
-    SCREEN_WIDTH = videomode.w;
-    SCREEN_HEIGHT = videomode.h;
 
     if (verbose)
         fprintf (stdout, "Current screen mode: %ix%i\n", SCREEN_WIDTH, SCREEN_HEIGHT);
 
     if (cfg_fullscreen)
+    {
+        SCREEN_WIDTH = videomode.w;
+        SCREEN_HEIGHT = videomode.h;
         window = SDL_CreateWindow("Pisound", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN);
+    }
     else
-        window = SDL_CreateWindow("Pisound", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_MAXIMIZED);
+    {
+        SCREEN_WIDTH = 656;
+        SCREEN_HEIGHT = 384;
+        window = SDL_CreateWindow("Pisound", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, NULL);
+    }
 
     if (window == NULL)
     {
@@ -216,9 +222,42 @@ static void sdl_poll_event (void)
 {
     SDL_Event event;
 
-    SDL_PollEvent (&event);
-    if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
-        running = 0;
+    while (SDL_PollEvent (&event))
+    {
+        switch (event.type)
+        {
+            case SDL_QUIT:
+                running = 0;
+                break;
+
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_ESCAPE:
+                    running = 0;
+                    break;
+                }
+                break;
+/*
+            case (SDL_WINDOWEVENT):
+                fprintf (stdout, "SDL_WINDOWEVENT %i\n", event.window.event);
+                switch (event.window.event)
+                {
+                    case SDL_WINDOWEVENT_MINIMIZED:
+                        fprintf (stdout, "Window minimised\n");
+                        break;
+                    case SDL_WINDOWEVENT_MAXIMIZED:
+                        fprintf (stdout, "Window maximised\n");
+                        break;
+                    case SDL_WINDOWEVENT_RESTORED:
+                        fprintf (stdout, "Window restored\n");
+
+                        break;
+                }
+                break;
+*/
+        }
+    }
 }
 
 int gfx_thread (void *ptr)
