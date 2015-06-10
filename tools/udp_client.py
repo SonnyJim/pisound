@@ -79,7 +79,9 @@ def send_thread ():
             data = struct.pack ("B", 0xfc)
             data += struct.pack ("B", int(trans))
         elif readkey == "S":
-            print "Not implemented"
+            score = raw_input ("Enter score: ")
+            data = struct.pack ("B", 0xe0)
+            data += struct.pack ("l", long(score))
         elif readkey == "P":
             player = raw_input ("Enter player number: ")
             data = struct.pack ("B", 0xe1)
