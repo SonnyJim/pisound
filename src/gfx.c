@@ -160,7 +160,7 @@ int init_screen (void)
     {
         SCREEN_WIDTH = 656;
         SCREEN_HEIGHT = 384;
-        window = SDL_CreateWindow("Pisound", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, NULL);
+        window = SDL_CreateWindow("Pisound", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     }
 
     if (window == NULL)
