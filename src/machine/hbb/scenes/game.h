@@ -1,12 +1,12 @@
 #include <SDL2/SDL.h>
 
-//SDL_Surface *score_srf; 
-SDL_Surface *score_outline_srf; 
-SDL_Texture *score_tex; 
-SDL_Texture *score_outline_tex; 
+//SDL_Surface *score_srf;
+SDL_Surface *score_outline_srf;
+SDL_Texture *score_tex;
+SDL_Texture *score_outline_tex;
 SDL_Rect    score_rect;
-SDL_Surface *background_srf; 
-SDL_Texture *background_tex; 
+SDL_Surface *background_srf;
+SDL_Texture *background_tex;
 SDL_Rect    background_rect;
 
 SDL_Surface *sprite_srf;
@@ -17,31 +17,30 @@ SDL_Rect    sprite_rect;
 SDL_Texture *player_tex;
 SDL_Rect    player_rect;
 
-#define IMG_BILLYBOB    "images/headshots/billybob.png"
-#define IMG_BUBBA       "images/headshots/bubba.png"
-#define IMG_GRANDPA     "images/headshots/grandpa.png"
-#define IMG_PEGGYSUE    "images/headshots/peggysue.png"
+#define MAX_SUBSCENES 4
 
-#define DIR_L 0
-#define DIR_D 1
-#define DIR_R 2
-#define DIR_U 3
+enum game_subscenes {
+    GAME_SIGN,
+    GAME_MINE,
+    GAME_OUTHOUSE,
+    GAME_RIVER
+};
 
-SDL_Texture *billybob_tex;
-SDL_Rect    billybob_rect;
+struct subscene_ops {
+    int (*init) (void);
+    char *name;
+    char *background;
+};
 
-SDL_Texture *bubba_tex;
-SDL_Rect    bubba_rect;
+int game_sign_init (void);
+int game_mine_init (void);
+int game_outhouse_init (void);
+int game_river_init (void);
 
-SDL_Texture *grandpa_tex;
-SDL_Rect    grandpa_rect;
-
-SDL_Texture *peggysue_tex;
-SDL_Rect    peggysue_rect;
-
-int sprite_x;
-int sprite_y;
-int x_up;
-int y_up;
-
-
+struct subscene_ops subscenes[MAX_SUBSCENES] =
+{
+    { game_sign_init, "Sign", "data/hbb/gfx/backgrounds/sign.png"},
+    { game_mine_init, "Mine", "data/hbb/gfx/backgrounds/mine.png"},
+    { game_outhouse_init, "Outhouse", "data/hbb/gfx/backgrounds/outhouse.png"},
+    { game_river_init, "River", "data/hbb/gfx/backgrounds/river.png"}
+};

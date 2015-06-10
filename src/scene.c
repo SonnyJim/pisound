@@ -6,6 +6,8 @@
 int scene_transition = 0;
 int scene_transition_running = 0;
 
+int (*scene_p[MAX_SCENES]) () = {draw_boot, draw_amode, draw_game, draw_gameover, draw_hsentry, draw_test, draw_tilt};
+
 const char *scene_names[] = {
     "Boot",
     "Attract mode",
@@ -15,8 +17,6 @@ const char *scene_names[] = {
     "Test mode",
     "TILT"
 };
-
-int (*scene_p[MAX_SCENES]) () = {draw_boot, draw_amode, draw_game, draw_gameover, draw_hsentry, draw_test, draw_tilt};
 
 static void scene_render_transition (void)
 {
@@ -36,9 +36,14 @@ static void scene_render_transition (void)
 int scene_draw (void)
 {
     int ret = 0;
-   
+
 
     SDL_RenderClear (renderer);
+    if (requested_subscene != running_subscene)
+    {
+        (*scene_p[requested_scene]) ();
+        running_subscene = requested_subscene;
+    }
     //If no transition, just draw the current scene
     if (!scene_transition && !scene_transition_running && running_scene != requested_scene)
     {
@@ -48,8 +53,7 @@ int scene_draw (void)
     else if (scene_transition && !scene_transition_running && running_scene != requested_scene)
     {
         //Setup the scene transition
-        if (verbose)
-            fprintf (stdout, "trans requested=%i current=%i running =%i\n", scene_transition, requested_scene, running_scene);
+        fprintf (stdout, "trans=%i current=%i running =%i\n", scene_transition, requested_scene, running_scene);
         if (scene_transition > NUM_TRANS_FX)
         {
             fprintf (stderr, "scene_draw:  Requested scene_transition out of range\n");
@@ -65,7 +69,7 @@ int scene_draw (void)
         SDL_SetRenderTarget (renderer, trans_scene2);
         SDL_RenderClear (renderer);
         (*scene_p[requested_scene]) ();
-       
+
         //Set the render target back to default
         SDL_SetRenderTarget (renderer, NULL);
         scene_transition_running = 1;
@@ -75,7 +79,6 @@ int scene_draw (void)
         scene_render_transition ();
     else
         ret = (*scene_p[running_scene]) ();
-    
 
     SDL_RenderPresent (renderer);
     return ret;

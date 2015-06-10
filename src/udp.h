@@ -19,8 +19,9 @@
 #define UDP_PLAYER_NUM      0xe1
 
 #define UDP_SCENE_CHANGE    0xfa
-#define UDP_SCENE_TRANS     0xfb
-#define UDP_SHUTDOWN        0xfc
+#define UDP_SUBSCENE_CHANGE 0xfb
+#define UDP_SCENE_TRANS     0xfc
+#define UDP_SHUTDOWN        0xfd
 #define UDP_PING            0xfe
 #define UDP_VERSION         0xff
 

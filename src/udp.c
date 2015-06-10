@@ -7,13 +7,13 @@
 
 static void udp_send_msg (char *msg, Uint32 cliaddr)
 {
-    Uint16 port = UDP_PORT + 1; 
+    Uint16 port = UDP_PORT + 1;
     strcpy ((char *)pms->data, msg);
     pms->len = strlen ((char *)pms->data);
     pms->address.host = cliaddr;
     pms->address.port = SDLNet_Read16(&port);
     if (verbose)
-        fprintf (stdout, "Sending msg: %s to %x %x\n", pms->data, pms->address.host, pms->address.port); 
+        fprintf (stdout, "Sending msg: %s to %x %x\n", pms->data, pms->address.host, pms->address.port);
     SDLNet_UDP_Send(sd, -1, pms);
 }
 
@@ -39,6 +39,20 @@ static void udp_scene_receive (Uint8 scene, Uint32 cliaddr)
     }
 }
 
+static void udp_subscene_receive (Uint8 scene, Uint32 cliaddr)
+{
+    if (scene >= 0 && scene < 4)
+    {
+        if (verbose)
+            fprintf (stdout, "subscene change requested: %i\n", scene);
+        requested_subscene = (int) scene;
+    }
+    else
+    {
+        fprintf (stderr, "Error: requested subscene %i out of range\n", scene);
+        udp_send_msg (UDP_MSG_ERROR, cliaddr);
+    }
+}
 static void udp_scene_trans (Uint8 trans)
 {
     if (verbose)
@@ -69,7 +83,7 @@ static void udp_decode_msg (char *msg, Uint32 cliaddr, int len)
 
     byte1 = msg[0];
     byte2 = msg[1];
-    
+
     //Error checking
     if (len < 1)
     {
@@ -136,6 +150,9 @@ static void udp_decode_msg (char *msg, Uint32 cliaddr, int len)
         case UDP_SCENE_CHANGE:
             udp_scene_receive (byte2, cliaddr);
             break;
+        case UDP_SUBSCENE_CHANGE:
+            udp_subscene_receive(byte2, cliaddr);
+            break;
         case UDP_SCENE_TRANS:
             udp_scene_trans (byte2);
             break;
@@ -148,7 +165,7 @@ static void udp_decode_msg (char *msg, Uint32 cliaddr, int len)
 
 int udp_thread (void *ptr)
 {
- 
+
     /* Open a UDP socket */
     if (!(sd = SDLNet_UDP_Open(UDP_PORT)))
     {
@@ -156,7 +173,7 @@ int udp_thread (void *ptr)
         return 1;
     }
 
- /* 
+ /*
     IPaddress serverIP;
     if (cfg_server_host[0] != '\0')
     {
@@ -181,7 +198,7 @@ int udp_thread (void *ptr)
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         return 1;
     }
-    
+
     if (!(pms = SDLNet_AllocPacket(UDP_BUFFLEN)))
     {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
@@ -195,7 +212,7 @@ int udp_thread (void *ptr)
             udp_decode_msg ((char *)pm->data, pm->address.host, pm->len);
         }
     }
-    
+
     if (verbose)
         fprintf (stdout, "Shutting down udp server\n");
     SDLNet_FreePacket(pm);
