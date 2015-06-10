@@ -1,15 +1,17 @@
 #!/usr/bin/python
-import socket, sys, thread
+import socket, sys, thread, struct
 import tty, termios
 
+#RIP = "192.168.1.80"
+RIP = "127.0.0.1"
+
+IP = "192.168.1.76"
 #IP = "127.0.0.1"
-IP = "192.168.1.80"
-RIP = "192.168.1.76"
 PORT = 8008
 RPORT = 8009
 RECV_BUFFSIZE = 1024
 running = 0
-message = ""
+data = ""
 
 def getch ():
     old_settings = termios.tcgetattr(0)
@@ -29,70 +31,64 @@ def getch ():
 #Thread to receive the UDP responses
 def recv_thread ():
     global running
-    sockr.bind ((IP, RPORT))
+    sockr.bind ((RIP, RPORT))
     while running:
         recv_data = sockr.recvfrom(RECV_BUFFSIZE)
         print "\nReceived: ", recv_data[0], "\n"
 
 #Thread to send the UDP messages
 def send_thread ():
-    global running, message
+    global running, data
     while running:
         readkey = getch ()
 
         if readkey == "=":
-            message = "03"
+            data = struct.pack("B", 3)
             print "Volume up"
         elif readkey == "-":
-            message = "04"
+            data = struct.pack("B", 4)
             print "Volume down"
         elif readkey == "v":
-            vol = raw_input ("Enter in volume (0-ff): ")
-            message = "05"
-            message = message + vol
+            vol = raw_input ("Enter in volume (0-127): ")
+            data += struct.pack("B", 0x05)
+            data += struct.pack("B", int(vol))
         elif readkey == "s":
-            sound = raw_input ("Enter in sound code (0-ff): ")
-            message = "00"
-            message = message + sound
+            sound = raw_input ("Enter in sound code (0-127): ")
+            data = struct.pack ("B", 0x00)
+            data += struct.pack ("B", int(sound))
         elif readkey == "m":
-            music = raw_input ("Enter in music code (0-ff): ")
-            message = "01"
-            message = message + music
-        elif readkey == "1":
-            message = "0000"
-        elif readkey == "2":
-            message = "0001"
-        elif readkey == "3":
-            message = "0002"
-        elif readkey == "4":
-            message = "0003"
-        elif readkey == "5":
-            message = "0004"
+            music = raw_input ("Enter in music code (0-127): ")
+            data = struct.pack ("B", 0x01)
+            data += struct.pack ("B", int(music))
         elif readkey == "p":
-            message = "fe"
-        elif readkey == "M":
-            message = raw_input ("Enter in custom message: ")
+            print "PING"
+            data = struct.pack ("B", 0xfe)
         elif readkey == "Q":
             print "Shutting down pisound server"
-            message = "fc"
+            data = struct.pack ("B", 0xfd)
         elif readkey == "c":
-            message = "fa"
-            message += raw_input ("Enter scene number: ")
+            scene = raw_input ("Enter scene number: ")
+            data = struct.pack ("B", 0xfa)
+            data += struct.pack ("B", int(scene))
+        elif readkey == "C":
+            scene = raw_input ("Enter subscene number: ")
+            data = struct.pack ("B", 0xfb)
+            data += struct.pack ("B", int(scene))
         elif readkey == "t":
-            message = "fb"
-            message += raw_input ("Enter transition effect: ")
+            trans = raw_input ("Enter transition effect: ")
+            data = struct.pack ("B", 0xfc)
+            data += struct.pack ("B", int(trans))
         elif readkey == "S":
-            message = "e0"
-            message += raw_input ("Enter score: ")
+            print "Not implemented"
         elif readkey == "P":
-            message = "e1"
-            message += raw_input ("Enter player number: ")
+            player = raw_input ("Enter player number: ")
+            data = struct.pack ("B", 0xe1)
+            data += struct.pack ("B", int(player))
         elif readkey == "q":
             running = 0
 
-        if len(message) > 0:
-            sock.sendto(message, (RIP, PORT))
-        message = ""
+        sock.sendto(data, (IP, PORT))
+        data = ""
 
 running = 1
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -104,6 +100,7 @@ print "s            Send sound code"
 print "m            Send music code"
 print "v            Set volume"
 print "c            Change scene"
+print "c            Change subscene"
 print "t            Change transition effect"
 print "S            Send score"
 print "P            Change player"
