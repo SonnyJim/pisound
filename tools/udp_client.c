@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <SDL_thread.h>
@@ -7,8 +8,8 @@
 
 #include "udp.h"
 
-#define NUM_CMDS 9
-#define IP "192.168.1.80"
+#define NUM_CMDS 10
+#define IP "127.0.0.1"
 
 UDPsocket socket;
 UDPpacket *send_p;
@@ -41,6 +42,7 @@ struct udp_cmd udp_cmds[NUM_CMDS] = {
     { "Set score", UDP_SCORE, sizeof(score)},
     { "Set player", UDP_PLAYER_NUM, 1},
     { "Set scene", UDP_SCENE_CHANGE, 1},
+    { "Set subscene", UDP_SUBSCENE_CHANGE, 1},
     { "Set transition", UDP_SCENE_TRANS, 1},
     { "Shutdown", UDP_SHUTDOWN, 0},
 };
@@ -225,7 +227,6 @@ static void send_cmd (void)
     {
         score = strtoll (score_str, NULL, 10);
         memcpy (msg + 1, &score, sizeof(score));
-        fprintf (stdout, "score %lld\n", score);
     }
     else if (udp_cmds[cmd_index].data_size == 0)
     {
@@ -253,7 +254,6 @@ static void remove_score_digit (void)
 
 void read_input (void)
 {
-    char msg[UDP_BUFFLEN];
 
     while (SDL_PollEvent (&event))
     {
@@ -270,7 +270,7 @@ void read_input (void)
         {
             switch (event.key.keysym.sym)
             {
-                case SDLK_q:
+                case SDLK_ESCAPE:
                     fprintf (stderr, "Quit\n");
                     running = 0;
                     break;
