@@ -2,6 +2,7 @@
 #include "gfx.h"
 #include "scene.h"
 #include "game.h"
+#include "shaving.h"
 
 void gfx_init_game_vars (void)
 {
@@ -109,7 +110,10 @@ static void render_score (void)
         SDL_SetTextureAlphaMod (score_outline_tex, 200);
 
         old_score = score;
+        if (score > 0)
+            init_shaving_all(score_rect.x + (score_rect.w / 2), score_rect.y + (score_rect.h / 2));
     }
+
     SDL_RenderCopy (renderer, score_tex, NULL, &score_rect);
     SDL_RenderCopy (renderer, score_outline_tex, NULL, &score_rect);
 
@@ -138,6 +142,8 @@ static void render_score (void)
         old_player_num = player_num;
     }
     SDL_RenderCopy (renderer, player_tex, NULL, &player_rect);
+
+    draw_shaving();
 }
 
 int draw_game (void)
